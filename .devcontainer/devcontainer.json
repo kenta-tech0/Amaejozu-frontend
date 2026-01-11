@@ -1,0 +1,64 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+"name": "Next.js Dev Container",
+"build": {
+    "dockerfile": "../Dockerfile"
+},
+// Features to add to the dev container. More info: https://containers.dev/features.
+"features": {
+// Microsoftが提供する一般的な開発ツールをインストールする公式Feature
+"ghcr.io/devcontainers/features/common-utils:2": {
+    // Zshをインストールし、デフォルトのシェルにする
+    "installZsh": true,
+    // Oh My Zsh (ターミナルをリッチにするフレームワーク) をインストール
+    "installOhMyZsh": true,
+    // ユーザー名をvscodeから変更しない (デフォルトのまま)
+    "username": "vscode",
+    "userUid": "automatic",
+    "userGid": "automatic",
+    // Zshをデフォルトシェルとして設定
+    "configureZshAsDefaultShell": true
+    }
+},
+"customizations": {
+    "vscode": {
+      // コンテナ内で自動的にインストールさせたい拡張機能
+    "extensions": [
+        // --- 基本セット ---
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        // --- Git関連 (チームで統一) ---
+        "mhutchie.git-graph", // SourceTreeを表示
+        "donjayamanne.githistory", // ファイルのGit履歴を表示
+        // --- 開発効率化 ---
+        "github.vscode-github-actions", // GitHub Actionsのワークフローを支援
+        "gruntfuggly.todo-tree", // コード内のTODOコメントをツリー表示
+        "christian-kohler.npm-intellisense", // package.jsonのnpmモジュール名を補完
+        "christian-kohler.path-intellisense", // ファイルパスを補完
+        "oderwat.indent-rainbow", // インデントを色付けして見やすくする
+        "shardulm94.trailing-spaces", // 不要な末尾スペースを可視化・削除
+        // --- Markdown編集用 ---
+        "yzhang.markdown-all-in-one", // Markdown編集のオールインワンツール
+        "davidanson.vscode-markdownlint" // Markdownの品質をチェック
+    ],
+      // コンテナ内でのみ有効にしたい設定
+    "settings": {
+        "editor.formatOnSave": true // 保存時に自動フォーマット
+    }
+    }
+},
+  // ホストPCのポートをコンテナのポートに転送
+"forwardPorts": [
+    3000
+],
+// コンテナ作成後に一度だけ実行されるコマンド
+// "postCreateCommand": "npm install",
+"postCreateCommand": "sudo chown -R vscode:vscode . || true && npm install",
+// コンテナ起動時に毎回実行されるコマンド
+"postAttachCommand": "npm run dev",
+// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+// "remoteUser": "root"
+"remoteUser": "vscode"
+}
