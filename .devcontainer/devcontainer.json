@@ -19,6 +19,7 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "bradlc.vscode-tailwindcss",
+    "streetsidesoftware.code-spell-checker",
     "mhutchie.git-graph",
     "donjayamanne.githistory",
     "github.vscode-github-actions",
