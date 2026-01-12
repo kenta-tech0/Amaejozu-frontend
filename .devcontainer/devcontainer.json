@@ -40,11 +40,4 @@
 "postCreateCommand": "sudo chown -R vscode:vscode . || true && npm install",
 "postStartCommand": "npm run dev -- --hostname 0.0.0.0",
 "remoteUser": "vscode",
-"runArgs": [
-"--network=amaejozu-network",
-"--name=frontend"
-],
-"mounts": [
-"source=${localWorkspaceFolder}/node_modules,target=/app/node_modules,type=bind,consistency=cached"
-]
 }
