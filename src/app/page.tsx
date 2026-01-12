@@ -7,7 +7,7 @@ export default function Home() {
   const [status, setStatus] = useState('接続中...');
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/health`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/app/api/health`)
       .then(res => res.json())
       .then(data => setStatus(`✅ ${data.message}`))
       .catch(err => setStatus(`❌ エラー: ${err.message}`));
