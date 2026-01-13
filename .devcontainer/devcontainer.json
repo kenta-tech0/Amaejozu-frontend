@@ -13,6 +13,9 @@
     "configureZshAsDefaultShell": true
 }
 },
+"mounts": [
+"source=${localEnv:HOME}${localEnv:USERPROFILE}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached"
+],
 "customizations": {
 "vscode": {
     "extensions": [
@@ -32,12 +35,13 @@
     "davidanson.vscode-markdownlint"
     ],
     "settings": {
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "terminal.integrated.defaultProfile.linux": "zsh"
     }
 }
 },
 "forwardPorts": [3000],
-"postCreateCommand": "sudo chown -R vscode:vscode . || true && npm install",
+"postCreateCommand": "sudo chown -R vscode:vscode . || true && npm install && sudo npm install -g @anthropic-ai/claude-code@1.0.37",
 "postStartCommand": "npm run dev -- --hostname 0.0.0.0",
 "remoteUser": "vscode"
 }
