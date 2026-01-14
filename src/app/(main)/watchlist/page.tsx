@@ -1,10 +1,11 @@
+
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { HomeScreen } from '@/components/Home/HomeScreen';
+import { WatchlistScreen } from '@/components/Watchlist/WatchlistScreen';
 import { TabBar } from '@/components/navigation/TabBar';
 import { Product } from '@/types/product';
 
-export default function Home() {
+export default function WatchlistPage() {
   const router = useRouter();
   const [watchlist, setWatchlist] = useState<Product[]>([]);
 
@@ -12,20 +13,23 @@ export default function Home() {
     router.push(`/products/${product.id}`);
   };
 
-  const handleAddToWatchlist = (product: Product) => {
-    if (watchlist.length < 50 && !watchlist.find(p => p.id === product.id)) {
-      setWatchlist([...watchlist, product]);
-    }
+  const handleRemoveFromWatchlist = (productId: string) => {
+    setWatchlist(watchlist.filter(p => p.id !== productId));
+  };
+
+  const handleNavigateToSearch = () => {
+    router.push('/search');
   };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 max-w-md mx-auto relative pb-20">
-      <HomeScreen
-        onViewProduct={handleViewProduct}
-        onAddToWatchlist={handleAddToWatchlist}
+      <WatchlistScreen
         watchlist={watchlist}
+        onViewProduct={handleViewProduct}
+        onRemoveFromWatchlist={handleRemoveFromWatchlist}
+        onNavigateToSearch={handleNavigateToSearch}
       />
-      <TabBar currentScreen="home" onNavigate={(screen) => {
+      <TabBar currentScreen="watchlist" onNavigate={(screen) => {
         if (screen === 'home') router.push('/');
         else router.push(`/${screen}`);
       }} />

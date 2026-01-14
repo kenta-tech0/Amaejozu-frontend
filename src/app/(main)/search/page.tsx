@@ -1,10 +1,11 @@
+
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { HomeScreen } from '@/components/Home/HomeScreen';
+import { SearchScreen } from '@/components/Search/SearchScreen';
 import { TabBar } from '@/components/navigation/TabBar';
 import { Product } from '@/types/product';
 
-export default function Home() {
+export default function SearchPage() {
   const router = useRouter();
   const [watchlist, setWatchlist] = useState<Product[]>([]);
 
@@ -20,12 +21,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 max-w-md mx-auto relative pb-20">
-      <HomeScreen
+      <SearchScreen
         onViewProduct={handleViewProduct}
         onAddToWatchlist={handleAddToWatchlist}
         watchlist={watchlist}
       />
-      <TabBar currentScreen="home" onNavigate={(screen) => {
+      <TabBar currentScreen="search" onNavigate={(screen) => {
         if (screen === 'home') router.push('/');
         else router.push(`/${screen}`);
       }} />

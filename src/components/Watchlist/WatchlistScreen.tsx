@@ -1,3 +1,5 @@
+'use client';
+
 import { Product } from '../../App';
 import { Heart, Search, Trash2 } from 'lucide-react';
 

@@ -1,3 +1,5 @@
+'use client';
+
 import { Home, Search, Heart, Settings } from 'lucide-react';
 
 interface TabBarProps {

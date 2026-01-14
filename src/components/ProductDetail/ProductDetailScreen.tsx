@@ -1,3 +1,5 @@
+'use client';
+
 import { Product } from '../../App';
 import { ArrowLeft, Heart, ExternalLink, Sparkles } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

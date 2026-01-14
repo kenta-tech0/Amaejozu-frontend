@@ -1,3 +1,5 @@
+'use client';
+
 import { Product } from '../../App';
 import { Plus, TrendingDown } from 'lucide-react';
 
