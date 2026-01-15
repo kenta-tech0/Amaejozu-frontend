@@ -9,24 +9,7 @@ import { WatchlistScreen } from '@/components/Watchlist/WatchlistScreen';
 import { SettingsScreen } from '@/components/Settings/SettingsScreen';
 import { ProductDetailScreen } from '@/components/ProductDetail/ProductDetailScreen';
 import { TabBar } from '@/components/TabBar';
-
-export interface Product {
-  id: string;
-  name: string;
-  image: string;
-  currentPrice: number;
-  originalPrice: number;
-  discount: number;
-  shop: string;
-  category: string;
-  brand?: string;
-  skinType?: string[];
-  aiReason?: string;
-  priceHistory: {
-    date: string;
-    price: number;
-  }[];
-}
+import { Product } from '@/types/product';
 
 type Screen = 'home' | 'search' | 'watchlist' | 'settings' | 'detail';
 

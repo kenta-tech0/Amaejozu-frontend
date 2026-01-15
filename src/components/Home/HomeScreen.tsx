@@ -1,4 +1,5 @@
-import { Product } from '../../App';
+import { Product } from '@/types/product';
+import { mockProducts } from '@/lib/mock-data';
 import { Plus, TrendingDown } from 'lucide-react';
 
 interface HomeScreenProps {
@@ -6,209 +7,6 @@ interface HomeScreenProps {
   onAddToWatchlist: (product: Product) => void;
   watchlist: Product[];
 }
-
-const mockProducts: Product[] = [
-  {
-    id: '1',
-    name: 'バルクオム THE TONER 化粧水 200ml',
-    image: 'https://images.unsplash.com/photo-1556228852-80c3a083d572?w=400&h=400&fit=crop',
-    currentPrice: 2640,
-    originalPrice: 3300,
-    discount: 20,
-    shop: 'Amazon',
-    category: '化粧水',
-    brand: 'BULK HOMME',
-    skinType: ['全ての肌タイプ'],
-    aiReason: 'バルクオムの人気化粧水が20%オフで¥2,640に。通常¥3,300のところ¥660引きは過去6ヶ月で最安値。メンズスキンケアの定番ブランドで、低刺激処方が人気。Amazonセール時期を狙った購入がおすすめです。',
-    priceHistory: [
-      { date: '2024-11-21', price: 3300 },
-      { date: '2024-11-28', price: 3100 },
-      { date: '2024-12-05', price: 2900 },
-      { date: '2024-12-12', price: 2750 },
-      { date: '2024-12-21', price: 2640 },
-    ],
-  },
-  {
-    id: '2',
-    name: 'ウーノ スキンケアタンク さっぱり 160ml',
-    image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop',
-    currentPrice: 680,
-    originalPrice: 980,
-    discount: 31,
-    shop: '楽天市場',
-    category: 'オールインワン',
-    brand: 'UNO',
-    skinType: ['脂性肌', '普通肌'],
-    aiReason: 'ウーノのオールインワンが31%オフの¥680。これ1本で化粧水・乳液・美容液の役割。通常¥980のところ¥300引きは破格。忙しいメンズに最適なコスパ商品です。',
-    priceHistory: [
-      { date: '2024-11-21', price: 980 },
-      { date: '2024-11-28', price: 880 },
-      { date: '2024-12-05', price: 780 },
-      { date: '2024-12-12', price: 720 },
-      { date: '2024-12-21', price: 680 },
-    ],
-  },
-  {
-    id: '3',
-    name: 'ORBIS Mr. フェイシャルクレンザー 110g',
-    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&h=400&fit=crop',
-    currentPrice: 1320,
-    originalPrice: 1650,
-    discount: 20,
-    shop: 'ORBIS公式',
-    category: '洗顔料',
-    brand: 'ORBIS',
-    skinType: ['脂性肌', '混合肌'],
-    aiReason: 'オルビスミスターの洗顔料が20%オフ。皮脂汚れをすっきり落としつつ、つっぱらない使用感。通常¥1,650から¥330引きで、公式セール価格です。',
-    priceHistory: [
-      { date: '2024-11-21', price: 1650 },
-      { date: '2024-11-28', price: 1550 },
-      { date: '2024-12-05', price: 1450 },
-      { date: '2024-12-12', price: 1380 },
-      { date: '2024-12-21', price: 1320 },
-    ],
-  },
-  {
-    id: '4',
-    name: 'ニベアメン アクティブエイジローション 110ml',
-    image: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=400&h=400&fit=crop',
-    currentPrice: 780,
-    originalPrice: 1080,
-    discount: 28,
-    shop: 'Amazon',
-    category: '化粧水',
-    brand: 'ニベアメン',
-    skinType: ['全ての肌タイプ'],
-    aiReason: 'ニベアメンのエイジングケア化粧水が28%オフ。コエンザイムQ10配合で年齢サインにアプローチ。通常¥1,080のところ¥780は過去最安値クラスです。',
-    priceHistory: [
-      { date: '2024-11-21', price: 1080 },
-      { date: '2024-11-28', price: 980 },
-      { date: '2024-12-05', price: 880 },
-      { date: '2024-12-12', price: 820 },
-      { date: '2024-12-21', price: 780 },
-    ],
-  },
-  {
-    id: '5',
-    name: 'クワトロボタニコ ボタニカル ローション & アフターシェーブ 115ml',
-    image: 'https://images.unsplash.com/photo-1612817288484-6f916006741a?w=400&h=400&fit=crop',
-    currentPrice: 1680,
-    originalPrice: 2200,
-    discount: 24,
-    shop: 'Yahoo!ショッピング',
-    category: 'オールインワン',
-    brand: 'クワトロボタニコ',
-    skinType: ['乾燥肌', '敏感肌'],
-    aiReason: 'クワトロボタニコのオールインワンが24%オフ。4つの植物エキス配合で、化粧水・美容液・乳液の機能を凝縮。通常¥2,200から¥520引きはお買い得です。',
-    priceHistory: [
-      { date: '2024-11-21', price: 2200 },
-      { date: '2024-11-28', price: 2050 },
-      { date: '2024-12-05', price: 1900 },
-      { date: '2024-12-12', price: 1780 },
-      { date: '2024-12-21', price: 1680 },
-    ],
-  },
-  {
-    id: '6',
-    name: 'ZIGEN オールインワン フェイスジェル 100g',
-    image: 'https://images.unsplash.com/photo-1585128903994-03b9e56c2e88?w=400&h=400&fit=crop',
-    currentPrice: 3300,
-    originalPrice: 4400,
-    discount: 25,
-    shop: 'Amazon',
-    category: 'オールインワン',
-    brand: 'ZIGEN',
-    skinType: ['全ての肌タイプ'],
-    aiReason: 'ZIGENの人気オールインワンが25%オフで¥3,300。セラミド・ヒアルロン酸・コラーゲン配合。通常¥4,400から¥1,100引きは年末セール価格です。',
-    priceHistory: [
-      { date: '2024-11-21', price: 4400 },
-      { date: '2024-11-28', price: 4100 },
-      { date: '2024-12-05', price: 3800 },
-      { date: '2024-12-12', price: 3500 },
-      { date: '2024-12-21', price: 3300 },
-    ],
-  },
-  {
-    id: '7',
-    name: 'メンズ��オレ UV SPF50+ PA++++ 40ml',
-    image: 'https://images.unsplash.com/photo-1532710093739-9470fe9a8bc8?w=400&h=400&fit=crop',
-    currentPrice: 580,
-    originalPrice: 880,
-    discount: 34,
-    shop: '楽天市場',
-    category: '日焼け止め',
-    brand: 'メンズビオレ',
-    skinType: ['全ての肌タイプ'],
-    aiReason: 'メンズビオレの日焼け止めが34%オフ。白浮きしない処方でベタつかない。通常¥880のところ¥580は冬季特価で、春の値上げ前に買うべき商品です。',
-    priceHistory: [
-      { date: '2024-11-21', price: 880 },
-      { date: '2024-11-28', price: 780 },
-      { date: '2024-12-05', price: 680 },
-      { date: '2024-12-12', price: 620 },
-      { date: '2024-12-21', price: 580 },
-    ],
-  },
-  {
-    id: '8',
-    name: '資生堂メン ハイドレーティングローション 150ml',
-    image: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&h=400&fit=crop',
-    currentPrice: 2200,
-    originalPrice: 2970,
-    discount: 26,
-    shop: 'Amazon',
-    category: '化粧水',
-    brand: '資生堂メン',
-    skinType: ['乾燥肌'],
-    aiReason: '資生堂メンの保湿化粧水が26%オフ。深層保湿テクノロジーで乾燥を防ぐ。通常¥2,970から¥770引きは狙い目で、デパコス品質がお手頃価格です。',
-    priceHistory: [
-      { date: '2024-11-21', price: 2970 },
-      { date: '2024-11-28', price: 2750 },
-      { date: '2024-12-05', price: 2500 },
-      { date: '2024-12-12', price: 2350 },
-      { date: '2024-12-21', price: 2200 },
-    ],
-  },
-  {
-    id: '9',
-    name: 'ルシード 薬用トータルケア乳液 100ml',
-    image: 'https://images.unsplash.com/photo-1556228852-80c3a083d572?w=400&h=400&fit=crop',
-    currentPrice: 880,
-    originalPrice: 1320,
-    discount: 33,
-    shop: 'Yahoo!ショッピング',
-    category: '乳液',
-    brand: 'ルシード',
-    skinType: ['全ての肌タイプ'],
-    aiReason: 'ルシードの薬用乳液が33%オフで¥880。40代からのメンズ向け。シミ・シワ・たるみにアプローチ。通常¥1,320から¥440引きは年末特価です。',
-    priceHistory: [
-      { date: '2024-11-21', price: 1320 },
-      { date: '2024-11-28', price: 1200 },
-      { date: '2024-12-05', price: 1080 },
-      { date: '2024-12-12', price: 980 },
-      { date: '2024-12-21', price: 880 },
-    ],
-  },
-  {
-    id: '10',
-    name: 'ギャツビー フェイシャルウォッシュ パーフェクトスクラブ 130g',
-    image: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=400&h=400&fit=crop',
-    currentPrice: 420,
-    originalPrice: 660,
-    discount: 36,
-    shop: 'Amazon',
-    category: '洗顔料',
-    brand: 'GATSBY',
-    skinType: ['脂性肌'],
-    aiReason: 'ギャツビーのスクラブ洗顔が36%オフで¥420。皮脂・毛穴汚れをすっきり除去。通常¥660から¥240引きで、プチプラメンズコスメの定番がさらにお得です。',
-    priceHistory: [
-      { date: '2024-11-21', price: 660 },
-      { date: '2024-11-28', price: 600 },
-      { date: '2024-12-05', price: 520 },
-      { date: '2024-12-12', price: 480 },
-      { date: '2024-12-21', price: 420 },
-    ],
-  },
-];
 
 export function HomeScreen({ onViewProduct, onAddToWatchlist, watchlist }: HomeScreenProps) {
   const currentTime = new Date();
@@ -239,7 +37,7 @@ export function HomeScreen({ onViewProduct, onAddToWatchlist, watchlist }: HomeS
         <div className="space-y-4">
           {mockProducts.map((product, index) => {
             const isInWatchlist = watchlist.some(p => p.id === product.id);
-            
+
             return (
               <div
                 key={product.id}
@@ -250,8 +48,8 @@ export function HomeScreen({ onViewProduct, onAddToWatchlist, watchlist }: HomeS
                   {/* Rank */}
                   <div className="flex-shrink-0">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                      index < 3 
-                        ? 'bg-orange-500 text-white' 
+                      index < 3
+                        ? 'bg-orange-500 text-white'
                         : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                     }`}>
                       {index + 1}
