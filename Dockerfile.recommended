@@ -1,0 +1,57 @@
+# =====================================
+# 開発用Dockerfile（Dev Container用）
+# =====================================
+# このファイルはDev Containersで使用することを想定しています
+
+# 1. ベースイメージの指定
+FROM node:22-slim
+
+# 2. メタデータ
+LABEL maintainer="Amaejozu Development Team"
+LABEL description="Next.js Development Container with Claude Code support"
+
+# 3. 必要なツールのインストール
+# - git: バージョン管理
+# - curl: ファイルダウンロード、ヘルスチェック
+# - ca-certificates: HTTPS通信
+# - procps: プロセス管理（ps, top等）
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    ca-certificates \
+    procps \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# 4. セキュリティ: 非rootユーザーの作成（Dev Containersの場合は自動で作成されるためコメントアウト）
+# Dev Containersのfeaturesで"common-utils"を使用している場合、自動でvscodeユーザーが作成されます
+# RUN useradd -m -s /bin/bash vscode
+
+# 5. 作業ディレクトリの指定（Dev Containersでは自動設定されるため不要）
+# WORKDIR /workspace
+
+# 6. Next.jsが使用するポートを公開
+EXPOSE 3000
+
+# 7. ヘルスチェック（オプション - 本番環境で有用）
+# Dev Container環境では通常不要ですが、docker-composeで使用する場合は有効
+# HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+#   CMD curl -f http://localhost:3000/ || exit 1
+
+# 8. 環境変数の設定（Dev Containersのdevcontainer.jsonで設定することを推奨）
+# ENV NODE_ENV=development
+# ENV NPM_CONFIG_UPDATE_NOTIFIER=false
+# ENV FORCE_COLOR=1
+
+# 9. デフォルトコマンド
+# Dev Containersでは postStartCommand を使用するため、このCMDは実行されません
+# この設定は、このDockerfileを他の用途（例: docker run）で使用する場合のフォールバック
+CMD ["bash"]
+
+# =====================================
+# 注意事項
+# =====================================
+# - このDockerfileはDev Container用です
+# - 本番環境用のDockerfileは別途作成してください
+# - Claude Codeのインストールはdevcontainer.jsonのpostCreateCommandで実行されます
+# - 依存関係(npm install)もpostCreateCommandで実行されます

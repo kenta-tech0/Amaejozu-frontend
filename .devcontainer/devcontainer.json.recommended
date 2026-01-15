@@ -1,0 +1,160 @@
+{
+  "name": "Next.js Dev Container with Claude Code",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "username": "vscode",
+      "userUid": "automatic",
+      "userGid": "automatic",
+      "configureZshAsDefaultShell": true
+    }
+  },
+  "mounts": [
+    // Claude Code設定の永続化（必須）
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.claude,target=/home/vscode/.claude,type=bind,consistency=cached",
+
+    // Git設定の共有（推奨）
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached,readonly",
+
+    // SSH設定の共有（オプション - Gitプッシュで必要な場合）
+    // 注意: セキュリティのためreadonlyでマウントし、必要に応じてコピーして使用
+    // "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/vscode/.ssh-localhost,type=bind,consistency=cached,readonly",
+
+    // node_modulesを高速化（特にWindowsで有効）
+    "source=amaejozu-node-modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // 基本的な開発ツール
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+
+        // Git関連
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "eamodio.gitlens",
+
+        // GitHub統合
+        "github.vscode-github-actions",
+
+        // コード品質
+        "streetsidesoftware.code-spell-checker",
+        "shardulm94.trailing-spaces",
+        "gruntfuggly.todo-tree",
+
+        // インテリセンス
+        "christian-kohler.npm-intellisense",
+        "christian-kohler.path-intellisense",
+
+        // エディタ機能強化
+        "oderwat.indent-rainbow",
+
+        // Markdown
+        "yzhang.markdown-all-in-one",
+        "davidanson.vscode-markdownlint",
+
+        // TypeScript（Next.js開発に推奨）
+        "ms-vscode.vscode-typescript-next"
+      ],
+      "settings": {
+        // エディタ設定
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.quickSuggestions": {
+          "other": "on",
+          "comments": "off",
+          "strings": "on"
+        },
+
+        // ターミナル設定
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "zsh": {
+            "path": "/bin/zsh",
+            "args": ["-l"]
+          }
+        },
+
+        // ファイル監視の最適化
+        "files.watcherExclude": {
+          "**/node_modules/**": true,
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          "**/dist/**": true,
+          "**/.next/**": true,
+          "**/coverage/**": true
+        },
+
+        // 検索の最適化
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/bower_components": true,
+          "**/.next": true,
+          "**/dist": true,
+          "**/coverage": true
+        },
+
+        // ESLint設定
+        "eslint.validate": [
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact"
+        ],
+
+        // Prettier設定
+        "prettier.requireConfig": true,
+
+        // TypeScript設定
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "javascript.updateImportsOnFileMove.enabled": "always"
+      }
+    }
+  },
+
+  // ポートフォワーディング
+  "forwardPorts": [3000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Next.js Dev Server",
+      "onAutoForward": "notify"
+    }
+  },
+
+  // 環境変数
+  "containerEnv": {
+    "NODE_ENV": "development",
+    "FORCE_COLOR": "1",
+    "NPM_CONFIG_UPDATE_NOTIFIER": "false"
+  },
+
+  // コンテナ作成時のコマンド
+  "postCreateCommand": "bash -c 'sudo chown -R vscode:vscode . || true && npm install && sudo npm install -g @anthropic-ai/claude-code@latest'",
+
+  // コンテナ起動時のコマンド
+  "postStartCommand": "npm run dev -- --hostname 0.0.0.0",
+
+  // リモートユーザー（セキュリティのため非root）
+  "remoteUser": "vscode",
+
+  // コンテナの機能
+  "capAdd": [],
+  "securityOpt": [],
+
+  // ライフサイクルコマンド
+  "initializeCommand": "echo 'Initializing Dev Container...'",
+  "onCreateCommand": "echo 'Dev Container created successfully!'",
+
+  // その他の設定
+  "shutdownAction": "stopContainer"
+}
