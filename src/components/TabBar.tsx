@@ -1,21 +1,22 @@
-import { Home, Search, Heart, Settings } from 'lucide-react';
+import { Home, Search, Heart, Settings, TrendingUp } from 'lucide-react';
 
 interface TabBarProps {
   currentScreen: string;
-  onNavigate: (screen: 'home' | 'search' | 'watchlist' | 'settings') => void;
+  onNavigate: (screen: 'home' | 'search' | 'watchlist' | 'settings' | 'top10') => void;
 }
 
 export function TabBar({ currentScreen, onNavigate }: TabBarProps) {
   const tabs = [
     { id: 'home', label: 'ホーム', icon: Home },
     { id: 'search', label: '検索', icon: Search },
+    { id: 'top10', label: 'TOP10', icon: TrendingUp },
     { id: 'watchlist', label: 'リスト', icon: Heart },
     { id: 'settings', label: '設定', icon: Settings },
   ] as const;
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 max-w-md mx-auto">
-      <div className="grid grid-cols-4">
+      <div className="grid grid-cols-5">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = currentScreen === tab.id;
