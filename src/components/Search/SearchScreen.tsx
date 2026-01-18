@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Product } from '../../App';
 import { Search, SlidersHorizontal, Plus } from 'lucide-react';
+import Image from 'next/image';
 
 interface SearchScreenProps {
   onViewProduct: (product: Product) => void;
@@ -312,9 +313,11 @@ export function SearchScreen({ onViewProduct, onAddToWatchlist, watchlist }: Sea
               >
                 <div className="relative mb-3">
                   {product.image ? (
-                    <img
+                    <Image
                       src={product.image || 'https://placehold.co/400x400?text=No+Image'}
                       alt={product.name}
+                      width={400}
+                      height={400}
                       className="w-full aspect-square object-cover rounded-xl"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
