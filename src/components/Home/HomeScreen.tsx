@@ -1,6 +1,7 @@
 import { Product } from '@/types/product';
 import { mockProducts } from '@/lib/mock-data';
 import { Plus, TrendingDown } from 'lucide-react';
+import Image from 'next/image';
 
 interface HomeScreenProps {
   onViewProduct: (product: Product) => void;
@@ -58,9 +59,11 @@ export function HomeScreen({ onViewProduct, onAddToWatchlist, watchlist }: HomeS
 
                   {/* Image */}
                   <div className="flex-shrink-0">
-                    <img
-                      src={product.image}
+                    <Image
+                      src={product.image || 'https://placehold.co/400x400?text=No+Image'}
                       alt={product.name}
+                      width={400}
+                      height={400}
                       className="w-20 h-20 object-cover rounded-xl"
                     />
                   </div>

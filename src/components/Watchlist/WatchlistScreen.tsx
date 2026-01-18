@@ -1,5 +1,6 @@
 import { Product } from '../../App';
 import { Heart, Search, Trash2 } from 'lucide-react';
+import Image from 'next/image';
 
 interface WatchlistScreenProps {
   watchlist: Product[];
@@ -66,9 +67,11 @@ export function WatchlistScreen({
                     className="flex-shrink-0 cursor-pointer"
                     onClick={() => onViewProduct(product)}
                   >
-                    <img
-                      src={product.image}
+                    <Image
+                      src={product.image || 'https://placehold.co/400x400?text=No+Image'}
                       alt={product.name}
+                      width={400}
+                      height={400}
                       className="w-24 h-24 object-cover rounded-xl"
                     />
                   </div>
