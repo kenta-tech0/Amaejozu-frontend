@@ -69,7 +69,7 @@ export function ProductDetailScreen({
         {/* Image */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
           <img
-            src={product.image}
+            src={product.image || 'https://placehold.co/400x400?text=No+Image'}
             alt={product.name}
             className="w-full aspect-square object-cover"
           />

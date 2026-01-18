@@ -67,7 +67,7 @@ export function WatchlistScreen({
                     onClick={() => onViewProduct(product)}
                   >
                     <img
-                      src={product.image}
+                      src={product.image || 'https://placehold.co/400x400?text=No+Image'}
                       alt={product.name}
                       className="w-24 h-24 object-cover rounded-xl"
                     />

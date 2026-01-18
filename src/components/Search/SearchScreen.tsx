@@ -313,7 +313,7 @@ export function SearchScreen({ onViewProduct, onAddToWatchlist, watchlist }: Sea
                 <div className="relative mb-3">
                   {product.image ? (
                     <img
-                      src={product.image}
+                      src={product.image || 'https://placehold.co/400x400?text=No+Image'}
                       alt={product.name}
                       className="w-full aspect-square object-cover rounded-xl"
                       onError={(e) => {
