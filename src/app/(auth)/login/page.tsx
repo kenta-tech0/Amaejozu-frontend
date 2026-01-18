@@ -1,3 +1,4 @@
+'use client'
 
 import { useRouter } from 'next/navigation';
 import { LoginScreen } from '@/components/Auth/LoginScreen';
