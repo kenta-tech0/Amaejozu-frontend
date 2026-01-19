@@ -1,6 +1,7 @@
 import { Product } from '../../App';
 import { ArrowLeft, Heart, ExternalLink, Sparkles } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import Image from 'next/image';
 
 interface ProductDetailScreenProps {
   product: Product;
@@ -68,9 +69,11 @@ export function ProductDetailScreen({
       <div className="px-6 pt-6 space-y-6">
         {/* Image */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
-          <img
-            src={product.image}
+          <Image
+            src={product.image || 'https://placehold.co/400x400?text=No+Image'}
             alt={product.name}
+            width={400}
+            height={400}
             className="w-full aspect-square object-cover"
           />
         </div>
