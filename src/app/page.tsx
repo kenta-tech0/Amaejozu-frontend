@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { TabBar } from '@/components/TabBar';
+import { Product } from '@/types/product';
 
 // 常に必要
 import { HomeScreen } from '@/components/Home/HomeScreen';
@@ -30,7 +31,11 @@ const ProductDetailScreen = dynamic(
   { loading: () => <div className="min-h-screen flex items-center justify-center">読み込み中...</div> }
 );
 
-type Screen = 'home' | 'search' | 'watchlist' | 'settings' | 'detail';
+const Top10Screen = dynamic(() => import('@/components/Top10/Top10Screen').then(m => ({ default: m.Top10Screen })), {
+  loading: () => <div className="min-h-screen flex items-center justify-center">読み込み中...</div>
+});
+
+type Screen = 'home' | 'search' | 'watchlist' | 'settings' | 'detail' | 'top10' ;
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -46,6 +51,7 @@ export default function Home() {
       import('@/components/Search/SearchScreen');
       import('@/components/Watchlist/WatchlistScreen');
       import('@/components/Settings/SettingsScreen');
+      import('@/components/Top10/Top10Screen');
     }
 
   }, [hasCompletedOnboarding, isAuthenticated]);
@@ -117,6 +123,9 @@ export default function Home() {
           onAddToWatchlist={handleAddToWatchlist}
           isInWatchlist={!!watchlist.find(p => p.id === selectedProduct.id)}
         />
+      )}
+      {currentScreen === 'top10' && (
+        <Top10Screen onViewProduct={handleViewProduct} />
       )}
       <TabBar currentScreen={currentScreen} onNavigate={setCurrentScreen} />
     </div>
