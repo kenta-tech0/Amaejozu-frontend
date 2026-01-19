@@ -1,15 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { TabBar } from '@/components/TabBar';
+
+// 常に必要
+import { HomeScreen } from '@/components/Home/HomeScreen';
 import { LoginScreen } from '@/components/Auth/LoginScreen';
 import { OnboardingScreen } from '@/components/Onboarding/OnboardingScreen';
-import { HomeScreen } from '@/components/Home/HomeScreen';
-import { SearchScreen } from '@/components/Search/SearchScreen';
-import { WatchlistScreen } from '@/components/Watchlist/WatchlistScreen';
-import { SettingsScreen } from '@/components/Settings/SettingsScreen';
-import { ProductDetailScreen } from '@/components/ProductDetail/ProductDetailScreen';
-import { TabBar } from '@/components/TabBar';
-import { Product } from '@/types/product';
+
+// 使う時だけ
+const SearchScreen = dynamic(
+  () => import('@/components/Search/SearchScreen').then(m => ({ default: m.SearchScreen })),
+  { loading: () => <div className="min-h-screen flex items-center justify-center">読み込み中...</div> }
+);
+
+const WatchlistScreen = dynamic(
+  () => import('@/components/Watchlist/WatchlistScreen').then(m => ({ default: m.WatchlistScreen })),
+  { loading: () => <div className="min-h-screen flex items-center justify-center">読み込み中...</div> }
+);
+
+const SettingsScreen = dynamic(
+  () => import('@/components/Settings/SettingsScreen').then(m => ({ default: m.SettingsScreen })),
+  { loading: () => <div className="min-h-screen flex items-center justify-center">読み込み中...</div> }
+);
+
+const ProductDetailScreen = dynamic(
+  () => import('@/components/ProductDetail/ProductDetailScreen').then(m => ({ default: m.ProductDetailScreen })),
+  { loading: () => <div className="min-h-screen flex items-center justify-center">読み込み中...</div> }
+);
 
 type Screen = 'home' | 'search' | 'watchlist' | 'settings' | 'detail';
 
@@ -20,6 +39,16 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [watchlist, setWatchlist] = useState<Product[]>([]);
 
+  // 🔥 ホーム画面表示時に他の画面を先読み
+  useEffect(() => {
+    if (hasCompletedOnboarding && isAuthenticated) {
+      // よく使われる画面を先読み
+      import('@/components/Search/SearchScreen');
+      import('@/components/Watchlist/WatchlistScreen');
+      import('@/components/Settings/SettingsScreen');
+    }
+
+  }, [hasCompletedOnboarding, isAuthenticated]);
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
