@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { TabBar } from '@/components/TabBar';
+import type { Product } from '@/types/product';
 
 // 常に必要
 import { HomeScreen } from '@/components/Home/HomeScreen';
@@ -30,7 +31,12 @@ const ProductDetailScreen = dynamic(
   { loading: () => <div className="min-h-screen flex items-center justify-center">読み込み中...</div> }
 );
 
-type Screen = 'home' | 'search' | 'watchlist' | 'settings' | 'detail';
+const Top10Screen = dynamic(
+  () => import('@/components/Top10/Top10Screen').then(m => ({ default: m.Top10Screen })),
+  { loading: () => <div className="min-h-screen flex items-center justify-center">読み込み中...</div> }
+);
+
+type Screen = 'home' | 'search' | 'watchlist' | 'settings' | 'detail' | 'top10';
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -110,6 +116,9 @@ export default function Home() {
         />
       )}
       {currentScreen === 'settings' && <SettingsScreen />}
+      {currentScreen === 'top10' && (
+        <Top10Screen onViewProduct={handleViewProduct} />
+      )}
       {currentScreen === 'detail' && selectedProduct && (
         <ProductDetailScreen
           product={selectedProduct}

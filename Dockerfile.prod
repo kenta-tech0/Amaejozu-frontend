@@ -1,0 +1,45 @@
+# ================================
+# ビルドステージ
+# ================================
+FROM node:22-slim AS builder
+
+WORKDIR /app
+
+# 依存関係ファイルを先にコピー（キャッシュ効率化）
+COPY package*.json ./
+
+# 依存関係のインストール
+RUN npm ci
+
+# ソースコードをコピー
+COPY . .
+
+# Next.jsアプリをビルド
+RUN npm run build
+
+# ================================
+# 本番ステージ
+# ================================
+FROM node:22-slim AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+
+# セキュリティ: non-rootユーザーで実行
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# standaloneビルドの成果物をコピー
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
