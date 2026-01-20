@@ -1,4 +1,4 @@
-import { Product } from '../../App';
+import { Product } from '../../types/product';
 import { Heart, Search, Trash2 } from 'lucide-react';
 import Image from 'next/image';
 

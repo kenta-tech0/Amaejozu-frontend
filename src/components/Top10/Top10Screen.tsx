@@ -73,11 +73,11 @@ export function Top10Screen({ onViewProduct }: Top10ScreenProps) {
                   </p>
                   
                   {/* AI Recommendation */}
-                  {product.aiRecommendation && (
+                  {product.aiReason && (
                     <div className="flex items-start gap-1 bg-purple-50 dark:bg-purple-900/20 rounded-lg p-2 mb-2">
                       <Sparkles className="w-4 h-4 text-purple-500 mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-purple-700 dark:text-purple-300 line-clamp-2">
-                        {product.aiRecommendation}
+                        {product.aiReason}
                       </p>
                     </div>
                   )}

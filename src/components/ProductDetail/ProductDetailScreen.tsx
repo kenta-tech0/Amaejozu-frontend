@@ -1,4 +1,4 @@
-import { Product } from '../../App';
+import { Product } from '../../types/product';
 import { ArrowLeft, Heart, ExternalLink, Sparkles } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import Image from 'next/image';

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Product } from '../../App';
+import { Product } from '../../types/product';
 import { Search, SlidersHorizontal, Plus } from 'lucide-react';
 import Image from 'next/image';
 
