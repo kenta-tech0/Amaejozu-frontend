@@ -52,6 +52,7 @@ export default function Home() {
       import('@/components/Search/SearchScreen');
       import('@/components/Watchlist/WatchlistScreen');
       import('@/components/Settings/SettingsScreen');
+      import('@/components/Top10/Top10Screen');
     }
 
   }, [hasCompletedOnboarding, isAuthenticated]);
@@ -126,6 +127,9 @@ export default function Home() {
           onAddToWatchlist={handleAddToWatchlist}
           isInWatchlist={!!watchlist.find(p => p.id === selectedProduct.id)}
         />
+      )}
+      {currentScreen === 'top10' && (
+        <Top10Screen onViewProduct={handleViewProduct} />
       )}
       <TabBar currentScreen={currentScreen} onNavigate={setCurrentScreen} />
     </div>
