@@ -16,9 +16,13 @@ import { DeleteAccountDialog } from "./DeleteAccountDialog";
 
 interface SettingsScreenProps {
   onLogout: () => void;
+  onNavigateToNotifications: () => void;
 }
 
-export function SettingsScreen({ onLogout }: SettingsScreenProps) {
+export function SettingsScreen({
+  onLogout,
+  onNavigateToNotifications,
+}: SettingsScreenProps) {
   const [pushNotification, setPushNotification] = useState(true);
   const [emailNotification, setEmailNotification] = useState(true);
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
@@ -112,7 +116,10 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
                 </button>
               </div>
               <div className="border-t border-slate-200 dark:border-slate-800" />
-              <div className="flex items-center justify-between px-4 py-4">
+              <button
+                onClick={onNavigateToNotifications}
+                className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-slate-600 dark:text-slate-400" />
                   <div>
@@ -122,21 +129,27 @@ export function SettingsScreen({ onLogout }: SettingsScreenProps) {
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => setEmailNotification(!emailNotification)}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
-                    emailNotification
-                      ? "bg-orange-500"
-                      : "bg-slate-300 dark:bg-slate-700"
-                  }`}
-                >
+                <div className="flex items-center gap-2">
                   <div
-                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                      emailNotification ? "translate-x-6" : "translate-x-0.5"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setEmailNotification(!emailNotification);
+                    }}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${
+                      emailNotification
+                        ? "bg-orange-500"
+                        : "bg-slate-300 dark:bg-slate-700"
                     }`}
-                  />
-                </button>
-              </div>
+                  >
+                    <div
+                      className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                        emailNotification ? "translate-x-6" : "translate-x-0.5"
+                      }`}
+                    />
+                  </div>
+                  <ChevronRight className="w-5 h-5 text-slate-400" />
+                </div>
+              </button>
             </div>
           </div>
 

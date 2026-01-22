@@ -53,6 +53,20 @@ const SettingsScreen = dynamic(
   },
 );
 
+const NotificationsScreen = dynamic(
+  () =>
+    import("@/components/Notifications/NotificationsScreen").then((m) => ({
+      default: m.NotificationsScreen,
+    })),
+  {
+    loading: () => (
+      <div className="min-h-screen flex items-center justify-center">
+        読み込み中...
+      </div>
+    ),
+  },
+);
+
 const ProductDetailScreen = dynamic(
   () =>
     import("@/components/ProductDetail/ProductDetailScreen").then((m) => ({
@@ -81,7 +95,14 @@ const Top10Screen = dynamic(
   },
 );
 
-type Screen = "home" | "search" | "watchlist" | "settings" | "detail" | "top10";
+type Screen =
+  | "home"
+  | "search"
+  | "watchlist"
+  | "settings"
+  | "detail"
+  | "top10"
+  | "notifications";
 
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -90,7 +111,7 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [watchlist, setWatchlist] = useState<Product[]>([]);
 
-  // 🔥 ホーム画面表示時に他の画面を先読み
+  // ホーム画面表示時に他の画面を先読み
   useEffect(() => {
     if (hasCompletedOnboarding && isAuthenticated) {
       // よく使われる画面を先読み
@@ -100,6 +121,7 @@ export default function Home() {
       import("@/components/Top10/Top10Screen");
     }
   }, [hasCompletedOnboarding, isAuthenticated]);
+
   const handleLogin = () => {
     setIsAuthenticated(true);
   };
@@ -161,7 +183,13 @@ export default function Home() {
         />
       )}
       {currentScreen === "settings" && (
-        <SettingsScreen onLogout={() => setIsAuthenticated(false)} />
+        <SettingsScreen
+          onLogout={() => setIsAuthenticated(false)}
+          onNavigateToNotifications={() => setCurrentScreen("notifications")}
+        />
+      )}
+      {currentScreen === "notifications" && (
+        <NotificationsScreen onBack={() => setCurrentScreen("settings")} />
       )}
       {currentScreen === "top10" && (
         <Top10Screen onViewProduct={handleViewProduct} />
@@ -173,9 +201,6 @@ export default function Home() {
           onAddToWatchlist={handleAddToWatchlist}
           isInWatchlist={!!watchlist.find((p) => p.id === selectedProduct.id)}
         />
-      )}
-      {currentScreen === "top10" && (
-        <Top10Screen onViewProduct={handleViewProduct} />
       )}
       <TabBar currentScreen={currentScreen} onNavigate={setCurrentScreen} />
     </div>
