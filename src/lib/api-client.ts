@@ -11,6 +11,12 @@ import type {
   WatchlistResponse,
   AddWatchlistRequest,
   MessageResponse,
+  ExternalSearchProduct,
+  ExternalSearchResponse,
+  ExternalSearchParams,
+  AddWatchlistWithProductRequest,
+  AddWatchlistWithProductResponse,
+  PriceHistoryResponse,
 } from "@/types/api";
 
 // トークン管理（認証チームが実装予定）
@@ -112,6 +118,17 @@ export const productsApi = {
     });
     return response.products;
   },
+
+  // 外部検索（楽天API経由、キャッシュ対応）
+  externalSearch: async (params: ExternalSearchParams): Promise<ExternalSearchResponse> => {
+    const searchParams = new URLSearchParams();
+    searchParams.set("keyword", params.keyword);
+    if (params.page !== undefined) searchParams.set("page", String(params.page));
+    if (params.limit !== undefined) searchParams.set("limit", String(params.limit));
+
+    const url = `/api/products/external-search?${searchParams.toString()}`;
+    return apiFetch<ExternalSearchResponse>(url);
+  },
 };
 
 // ウォッチリストAPI
@@ -138,6 +155,26 @@ export const watchlistApi = {
     await apiFetch<void>(`/api/watchlist/${watchlistItemId}`, {
       method: "DELETE",
     });
+  },
+
+  // 商品データ付きでウォッチリストに追加
+  addWithProduct: async (
+    product: ExternalSearchProduct,
+    targetPrice?: number
+  ): Promise<AddWatchlistWithProductResponse> => {
+    const body: AddWatchlistWithProductRequest = { product };
+    if (targetPrice !== undefined) {
+      body.target_price = targetPrice;
+    }
+    return apiFetch<AddWatchlistWithProductResponse>("/api/watchlist/with-product", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+
+  // 価格履歴取得
+  getPriceHistory: async (watchlistItemId: string): Promise<PriceHistoryResponse> => {
+    return apiFetch<PriceHistoryResponse>(`/api/watchlist/${watchlistItemId}/price-history`);
   },
 };
 

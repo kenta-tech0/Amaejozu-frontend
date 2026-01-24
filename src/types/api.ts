@@ -103,3 +103,59 @@ export interface AddWatchlistRequest {
 export interface MessageResponse {
   message: string;
 }
+
+// 外部検索商品（楽天API経由）
+export interface ExternalSearchProduct {
+  rakuten_product_id: string;
+  name: string;
+  price: number;
+  shop_name: string;
+  image_url: string;
+  product_url: string;
+  affiliate_url: string;
+  review_average: number;
+  review_count: number;
+}
+
+export interface ExternalSearchResponse {
+  status: "ok";
+  products: ExternalSearchProduct[];
+  total: number;
+  page: number;
+  limit: number;
+  cached: boolean;
+}
+
+export interface ExternalSearchParams {
+  keyword: string;
+  page?: number;
+  limit?: number;
+}
+
+// ウォッチリスト追加（商品データ付き）
+export interface AddWatchlistWithProductRequest {
+  product: ExternalSearchProduct;
+  target_price?: number;
+}
+
+export interface AddWatchlistWithProductResponse {
+  id: string;
+  product: {
+    id: string;
+    name: string;
+    current_price: number;
+    image_url: string;
+  };
+  target_price?: number;
+  added_at: string;
+}
+
+// 価格履歴
+export interface PriceHistoryItem {
+  price: number;
+  recorded_at: string;
+}
+
+export interface PriceHistoryResponse {
+  price_history: PriceHistoryItem[];
+}
