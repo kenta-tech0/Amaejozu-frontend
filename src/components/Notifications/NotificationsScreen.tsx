@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Mail, Clock, Bell } from "lucide-react";
+import { notificationApi } from "@/lib/api-client";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ErrorMessage from "@/components/common/ErrorMessage";
 
 interface NotificationsScreenProps {
   onBack: () => void;
@@ -9,54 +12,70 @@ interface NotificationsScreenProps {
 
 export function NotificationsScreen({ onBack }: NotificationsScreenProps) {
   const [emailNotification, setEmailNotification] = useState(true);
-  const [frequency, setFrequency] = useState<"instant" | "daily" | "weekly">(
-    "instant",
+  const [frequency, setFrequency] = useState<"daily" | "weekly" | "never">(
+    "daily",
   );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // モックの通知履歴データ
   const notificationHistory = [
-    { 
-      id: 1, 
-      date: "2時間前", 
-      product: "オーガニック化粧水", 
+    {
+      id: 1,
+      date: "2時間前",
+      product: "オーガニック化粧水",
       discount: "15%OFF",
       oldPrice: 3980,
-      newPrice: 3383
+      newPrice: 3383,
     },
-    { 
-      id: 2, 
-      date: "昨日", 
-      product: "美容液セット", 
+    {
+      id: 2,
+      date: "昨日",
+      product: "美容液セット",
       discount: "20%OFF",
       oldPrice: 5800,
-      newPrice: 4640
+      newPrice: 4640,
     },
-    { 
-      id: 3, 
-      date: "3日前", 
-      product: "保湿クリーム", 
+    {
+      id: 3,
+      date: "3日前",
+      product: "保湿クリーム",
       discount: "10%OFF",
       oldPrice: 2400,
-      newPrice: 2160
+      newPrice: 2160,
     },
   ];
 
+  // 初期設定を取得
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoading(true);
+        const settings = await notificationApi.getSettings();
+        setEmailNotification(settings.email_notifications);
+        setFrequency(settings.notification_frequency as typeof frequency);
+        setError(null);
+      } catch (err) {
+        setError("設定の取得に失敗しました");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
   const handleSave = async () => {
     setIsSaving(true);
-    
+
     try {
-      // TODO: 本番APIに差し替え
-      // await fetch('/api/users/settings', {
-      //   method: 'PATCH',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ emailNotification, frequency })
-      // });
-      
-      // モック保存処理（1秒待機）
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log("保存:", { emailNotification, frequency });
+      await notificationApi.updateSettings({
+        email_notifications: emailNotification,
+        notification_frequency: frequency,
+      });
+
       alert("設定を保存しました ✓");
     } catch (error) {
       console.error("保存エラー:", error);
@@ -65,6 +84,9 @@ export function NotificationsScreen({ onBack }: NotificationsScreenProps) {
       setIsSaving(false);
     }
   };
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error} />;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -129,13 +151,13 @@ export function NotificationsScreen({ onBack }: NotificationsScreenProps) {
           </h2>
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
             {[
-              {
-                value: "instant",
-                label: "即時",
-                desc: "価格が下がったらすぐに通知",
-              },
               { value: "daily", label: "日次", desc: "1日1回まとめて通知" },
               { value: "weekly", label: "週次", desc: "週1回まとめて通知" },
+              {
+                value: "never",
+                label: "通知しない",
+                desc: "価格変動の通知を受け取らない",
+              },
             ].map((option, index) => (
               <div key={option.value}>
                 {index > 0 && (
@@ -188,7 +210,8 @@ export function NotificationsScreen({ onBack }: NotificationsScreenProps) {
                           {item.product}
                         </p>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                          ¥{item.oldPrice.toLocaleString()} → ¥{item.newPrice.toLocaleString()}
+                          ¥{item.oldPrice.toLocaleString()} → ¥
+                          {item.newPrice.toLocaleString()}
                         </p>
                         <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                           {item.date}
