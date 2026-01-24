@@ -11,6 +11,12 @@ import type {
   WatchlistResponse,
   AddWatchlistRequest,
   MessageResponse,
+  ExternalSearchProduct,
+  ExternalSearchResponse,
+  ExternalSearchParams,
+  AddWatchlistWithProductRequest,
+  AddWatchlistWithProductResponse,
+  PriceHistoryResponse,
 } from "@/types/api";
 
 // トークン管理（認証チームが実装予定）
