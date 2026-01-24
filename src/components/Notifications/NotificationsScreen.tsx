@@ -12,9 +12,7 @@ interface NotificationsScreenProps {
 
 export function NotificationsScreen({ onBack }: NotificationsScreenProps) {
   const [emailNotification, setEmailNotification] = useState(true);
-  const [frequency, setFrequency] = useState<"daily" | "weekly" | "never">(
-    "daily",
-  );
+  const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -153,11 +151,6 @@ export function NotificationsScreen({ onBack }: NotificationsScreenProps) {
             {[
               { value: "daily", label: "日次", desc: "1日1回まとめて通知" },
               { value: "weekly", label: "週次", desc: "週1回まとめて通知" },
-              {
-                value: "never",
-                label: "通知しない",
-                desc: "価格変動の通知を受け取らない",
-              },
             ].map((option, index) => (
               <div key={option.value}>
                 {index > 0 && (
