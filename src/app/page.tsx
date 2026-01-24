@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { TabBar } from "@/components/TabBar";
 import type { Product } from "@/types/product";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 // 常に必要
 import { HomeScreen } from "@/components/Home/HomeScreen";
@@ -17,11 +18,7 @@ const SearchScreen = dynamic(
       default: m.SearchScreen,
     })),
   {
-    loading: () => (
-      <div className="min-h-screen flex items-center justify-center">
-        読み込み中...
-      </div>
-    ),
+    loading: () => <LoadingSpinner />,
   },
 );
 
@@ -31,11 +28,7 @@ const WatchlistScreen = dynamic(
       default: m.WatchlistScreen,
     })),
   {
-    loading: () => (
-      <div className="min-h-screen flex items-center justify-center">
-        読み込み中...
-      </div>
-    ),
+    loading: () => <LoadingSpinner />,
   },
 );
 
@@ -45,11 +38,7 @@ const SettingsScreen = dynamic(
       default: m.SettingsScreen,
     })),
   {
-    loading: () => (
-      <div className="min-h-screen flex items-center justify-center">
-        読み込み中...
-      </div>
-    ),
+    loading: () => <LoadingSpinner />,
   },
 );
 
@@ -59,11 +48,7 @@ const NotificationsScreen = dynamic(
       default: m.NotificationsScreen,
     })),
   {
-    loading: () => (
-      <div className="min-h-screen flex items-center justify-center">
-        読み込み中...
-      </div>
-    ),
+    loading: () => <LoadingSpinner />,
   },
 );
 
@@ -73,11 +58,7 @@ const ProductDetailScreen = dynamic(
       default: m.ProductDetailScreen,
     })),
   {
-    loading: () => (
-      <div className="min-h-screen flex items-center justify-center">
-        読み込み中...
-      </div>
-    ),
+    loading: () => <LoadingSpinner />,
   },
 );
 
@@ -87,11 +68,7 @@ const Top10Screen = dynamic(
       default: m.Top10Screen,
     })),
   {
-    loading: () => (
-      <div className="min-h-screen flex items-center justify-center">
-        読み込み中...
-      </div>
-    ),
+    loading: () => <LoadingSpinner />,
   },
 );
 
