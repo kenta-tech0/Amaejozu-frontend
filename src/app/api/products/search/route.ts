@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const queryString = searchParams.toString();
 
-    const url = `${API_URL}/app/api/products/search${queryString ? `?${queryString}` : ""}`;
+    const url = `${API_URL}/api/products/search${queryString ? `?${queryString}` : ""}`;
 
     const response = await fetch(url, {
       method: "GET",

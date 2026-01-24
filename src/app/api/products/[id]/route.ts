@@ -9,7 +9,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    const response = await fetch(`${API_URL}/app/api/products/${id}`, {
+    const response = await fetch(`${API_URL}/api/products/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
