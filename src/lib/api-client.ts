@@ -43,7 +43,7 @@ export const tokenManager = {
 export class ApiClientError extends Error {
   constructor(
     public status: number,
-    public detail: string
+    public detail: string,
   ) {
     super(detail);
     this.name = "ApiClientError";
@@ -53,7 +53,7 @@ export class ApiClientError extends Error {
 // 共通fetch関数
 async function apiFetch<T>(
   endpoint: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
 ): Promise<T> {
   const token = tokenManager.getToken();
 
@@ -79,7 +79,10 @@ async function apiFetch<T>(
   const data = await response.json();
 
   if (!response.ok) {
-    throw new ApiClientError(response.status, data.detail || "エラーが発生しました");
+    throw new ApiClientError(
+      response.status,
+      data.detail || "エラーが発生しました",
+    );
   }
 
   return data as T;
@@ -87,17 +90,23 @@ async function apiFetch<T>(
 
 // 商品API
 export const productsApi = {
-  search: async (params: ProductSearchParams = {}): Promise<ProductSearchResponse> => {
+  search: async (
+    params: ProductSearchParams = {},
+  ): Promise<ProductSearchResponse> => {
     const searchParams = new URLSearchParams();
 
     if (params.keyword) searchParams.set("keyword", params.keyword);
     if (params.category_id) searchParams.set("category_id", params.category_id);
     if (params.brand_id) searchParams.set("brand_id", params.brand_id);
-    if (params.min_price !== undefined) searchParams.set("min_price", String(params.min_price));
-    if (params.max_price !== undefined) searchParams.set("max_price", String(params.max_price));
+    if (params.min_price !== undefined)
+      searchParams.set("min_price", String(params.min_price));
+    if (params.max_price !== undefined)
+      searchParams.set("max_price", String(params.max_price));
     if (params.sort_by) searchParams.set("sort_by", params.sort_by);
-    if (params.page !== undefined) searchParams.set("page", String(params.page));
-    if (params.limit !== undefined) searchParams.set("limit", String(params.limit));
+    if (params.page !== undefined)
+      searchParams.set("page", String(params.page));
+    if (params.limit !== undefined)
+      searchParams.set("limit", String(params.limit));
 
     const queryString = searchParams.toString();
     const url = `/api/products/search${queryString ? `?${queryString}` : ""}`;
@@ -106,7 +115,9 @@ export const productsApi = {
   },
 
   getById: async (id: string): Promise<ApiProduct> => {
-    const response = await apiFetch<ProductDetailResponse>(`/api/products/${id}`);
+    const response = await apiFetch<ProductDetailResponse>(
+      `/api/products/${id}`,
+    );
     return response.product;
   },
 
@@ -120,11 +131,15 @@ export const productsApi = {
   },
 
   // 外部検索（楽天API経由、キャッシュ対応）
-  externalSearch: async (params: ExternalSearchParams): Promise<ExternalSearchResponse> => {
+  externalSearch: async (
+    params: ExternalSearchParams,
+  ): Promise<ExternalSearchResponse> => {
     const searchParams = new URLSearchParams();
     searchParams.set("keyword", params.keyword);
-    if (params.page !== undefined) searchParams.set("page", String(params.page));
-    if (params.limit !== undefined) searchParams.set("limit", String(params.limit));
+    if (params.page !== undefined)
+      searchParams.set("page", String(params.page));
+    if (params.limit !== undefined)
+      searchParams.set("limit", String(params.limit));
 
     const url = `/api/products/external-search?${searchParams.toString()}`;
     return apiFetch<ExternalSearchResponse>(url);
@@ -138,7 +153,10 @@ export const watchlistApi = {
     return response.watchlist;
   },
 
-  add: async (productId: string, targetPrice?: number): Promise<MessageResponse> => {
+  add: async (
+    productId: string,
+    targetPrice?: number,
+  ): Promise<MessageResponse> => {
     const body: AddWatchlistRequest = {
       product_id: productId,
     };
@@ -160,21 +178,50 @@ export const watchlistApi = {
   // 商品データ付きでウォッチリストに追加
   addWithProduct: async (
     product: ExternalSearchProduct,
-    targetPrice?: number
+    targetPrice?: number,
   ): Promise<AddWatchlistWithProductResponse> => {
     const body: AddWatchlistWithProductRequest = { product };
     if (targetPrice !== undefined) {
       body.target_price = targetPrice;
     }
-    return apiFetch<AddWatchlistWithProductResponse>("/api/watchlist/with-product", {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
+    return apiFetch<AddWatchlistWithProductResponse>(
+      "/api/watchlist/with-product",
+      {
+        method: "POST",
+        body: JSON.stringify(body),
+      },
+    );
   },
 
   // 価格履歴取得
-  getPriceHistory: async (watchlistItemId: string): Promise<PriceHistoryResponse> => {
-    return apiFetch<PriceHistoryResponse>(`/api/watchlist/${watchlistItemId}/price-history`);
+  getPriceHistory: async (
+    watchlistItemId: string,
+  ): Promise<PriceHistoryResponse> => {
+    return apiFetch<PriceHistoryResponse>(
+      `/api/watchlist/${watchlistItemId}/price-history`,
+    );
+  },
+};
+
+// 通知設定 API
+export const notificationApi = {
+  // 取得
+  getSettings: async (): Promise<{
+    email_notifications: boolean;
+    notification_frequency: string;
+  }> => {
+    return apiFetch("/api/user/notification-settings");
+  },
+
+  // 更新
+  updateSettings: async (params: {
+    email_notifications?: boolean;
+    notification_frequency?: "instant" | "daily" | "weekly";
+  }) => {
+    return apiFetch("/api/user/notification-settings", {
+      method: "PUT",
+      body: JSON.stringify(params),
+    });
   },
 };
 
