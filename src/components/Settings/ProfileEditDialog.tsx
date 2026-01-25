@@ -53,12 +53,10 @@ export function ProfileEditDialog({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>プロフィール編集</DialogTitle>
-          <DialogDescription>
-            プロフィール情報を編集できます
-          </DialogDescription>
+          <DialogDescription>プロフィール情報を編集できます</DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-4">
+        <div className="space-y-4 py-4 overflow-y-auto max-h-[60vh] px-1">
           {/* 名前入力 */}
           <div className="space-y-2">
             <label
@@ -173,9 +171,7 @@ export function ProfileEditDialog({
               />
               {/* エラーメッセージ */}
               {showPasswordError && (
-                <p className="text-sm text-red-500">
-                  パスワードが一致しません
-                </p>
+                <p className="text-sm text-red-500">パスワードが一致しません</p>
               )}
             </div>
           </div>
