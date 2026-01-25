@@ -8,6 +8,18 @@ import { Search, Plus } from "lucide-react";
 import Image from "next/image";
 import { convertExternalProductToProduct } from "@/types/product";
 
+// 人気キーワード
+const popularKeywords = [
+  "化粧水",
+  "乳液",
+  "洗顔料",
+  "美容液",
+  "オールインワン",
+  "シェービング",
+  "日焼け止め",
+  "アイクリーム",
+];
+
 interface SearchScreenProps {
   onViewProduct: (product: Product) => void;
   onAddToWatchlist: (product: Product) => void;
@@ -30,15 +42,13 @@ export function SearchScreen({
   // API連携用のstate
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastSearchQuery, setLastSearchQuery] = useState<string>("");
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [lastSearchQuery, setLastSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-
   const ITEMS_PER_PAGE = 30;
 
   useEffect(() => {
-    // キーワードが空の場合は検索結果をクリア
     if (!searchQuery.trim()) {
       onSearchProductsChange([]);
       setLastSearchQuery("");
@@ -47,7 +57,6 @@ export function SearchScreen({
       return;
     }
 
-    // 前回と同じクエリの場合は検索しない（APIリクエスト削減）
     if (searchQuery === lastSearchQuery) {
       return;
     }
@@ -73,7 +82,6 @@ export function SearchScreen({
       }
     };
 
-    // デバウンス：入力後500ms待ってから検索
     const timer = setTimeout(fetchProducts, 500);
     return () => clearTimeout(timer);
   }, [searchQuery, lastSearchQuery, onSearchProductsChange, ITEMS_PER_PAGE]);
@@ -97,7 +105,9 @@ export function SearchScreen({
       setCurrentPage(nextPage);
       setHasMore(response.products.length === ITEMS_PER_PAGE);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "追加読み込みに失敗しました");
+      setError(
+        err instanceof Error ? err.message : "追加読み込みに失敗しました",
+      );
     } finally {
       setLoadingMore(false);
     }
@@ -123,6 +133,30 @@ export function SearchScreen({
           />
         </div>
       </div>
+
+      {/* Popular Keywords */}
+      {!searchQuery && (
+        <div className="mb-4">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+            人気のキーワード
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {popularKeywords.map((keyword) => (
+              <button
+                key={keyword}
+                onClick={() => {
+                  // 一度クリアしてから設定することで、同じキーワードでも再検索される
+                  onSearchQueryChange("");
+                  setTimeout(() => onSearchQueryChange(keyword), 0);
+                }}
+                className="px-3 py-1.5 text-sm bg-slate-100 dark:bg-slate-800 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 rounded-lg transition-colors"
+              >
+                {keyword}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Results */}
       <div className="px-6 pt-4">
