@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from "react";
-import { TrendingDown, Mail, Lock, Loader2 } from "lucide-react";
+import { useState } from 'react';
+import { TrendingDown, Mail, Lock, Chrome, Loader2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginScreenProps {
@@ -11,8 +11,8 @@ interface LoginScreenProps {
 export function LoginScreen({ onForgotPassword }: LoginScreenProps) {
   const { login, signup, isLoading } = useAuth();
   const [isLoginMode, setIsLoginMode] = useState(true);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -60,8 +60,8 @@ export function LoginScreen({ onForgotPassword }: LoginScreenProps) {
             }}
             className={`flex-1 py-3 rounded-xl transition-all ${
               isLoginMode
-                ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
-                : "text-slate-600 dark:text-slate-400"
+                ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             ログイン
@@ -73,8 +73,8 @@ export function LoginScreen({ onForgotPassword }: LoginScreenProps) {
             }}
             className={`flex-1 py-3 rounded-xl transition-all ${
               !isLoginMode
-                ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
-                : "text-slate-600 dark:text-slate-400"
+                ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
+                : 'text-slate-600 dark:text-slate-400'
             }`}
           >
             新規登録
@@ -143,7 +143,7 @@ export function LoginScreen({ onForgotPassword }: LoginScreenProps) {
                 <span>処理中...</span>
               </>
             ) : (
-              <span>{isLoginMode ? "ログイン" : "新規登録"}</span>
+              <span>{isLoginMode ? 'ログイン' : '新規登録'}</span>
             )}
           </button>
         </form>

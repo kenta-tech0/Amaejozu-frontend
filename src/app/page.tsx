@@ -117,6 +117,10 @@ function AppContent() {
       import("@/components/Watchlist/WatchlistScreen");
       import("@/components/Settings/SettingsScreen");
       import("@/components/Top10/Top10Screen");
+      import('@/components/Search/SearchScreen');
+      import('@/components/Watchlist/WatchlistScreen');
+      import('@/components/Settings/SettingsScreen');
+      import('@/components/Top10/Top10Screen');
     }
   }, [hasCompletedOnboarding, isAuthenticated]);
 
