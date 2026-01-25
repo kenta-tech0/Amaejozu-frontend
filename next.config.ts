@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "placehold.co",
       },
+      {
+        protocol: "https",
+        hostname: "thumbnail.image.rakuten.co.jp", // 追加
+      },
+      {
+        protocol: "https",
+        hostname: "image.rakuten.co.jp", // 追加
+      },
     ],
   },
 };

@@ -1,7 +1,15 @@
-import { Product } from '../../types/product';
-import { ArrowLeft, Heart, ExternalLink, Sparkles } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import Image from 'next/image';
+import { Product } from "../../types/product";
+import { ArrowLeft, Heart, ExternalLink, Sparkles } from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import Image from "next/image";
 
 interface ProductDetailScreenProps {
   product: Product;
@@ -10,11 +18,27 @@ interface ProductDetailScreenProps {
   isInWatchlist: boolean;
 }
 
-export function ProductDetailScreen({ 
-  product, 
-  onBack, 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 shadow-lg">
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
+          {label}
+        </p>
+        <p className="text-slate-900 dark:text-white">
+          ¥{payload[0].value.toLocaleString()}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
+
+export function ProductDetailScreen({
+  product,
+  onBack,
   onAddToWatchlist,
-  isInWatchlist 
+  isInWatchlist,
 }: ProductDetailScreenProps) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -23,20 +47,6 @@ export function ProductDetailScreen({
 
   const formatPrice = (value: number) => {
     return `¥${(value / 1000).toFixed(0)}k`;
-  };
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 shadow-lg">
-          <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">{label}</p>
-          <p className="text-slate-900 dark:text-white">
-            ¥{payload[0].value.toLocaleString()}
-          </p>
-        </div>
-      );
-    }
-    return null;
   };
 
   return (
@@ -56,11 +66,13 @@ export function ProductDetailScreen({
             disabled={isInWatchlist}
             className={`w-10 h-10 flex items-center justify-center rounded-xl transition-colors ${
               isInWatchlist
-                ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                ? "bg-orange-50 dark:bg-orange-900/20 text-orange-500"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700"
             }`}
           >
-            <Heart className={`w-5 h-5 ${isInWatchlist ? 'fill-current' : ''}`} />
+            <Heart
+              className={`w-5 h-5 ${isInWatchlist ? "fill-current" : ""}`}
+            />
           </button>
         </div>
       </div>
@@ -70,7 +82,7 @@ export function ProductDetailScreen({
         {/* Image */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
           <Image
-            src={product.image || 'https://placehold.co/400x400?text=No+Image'}
+            src={product.image || "https://placehold.co/400x400?text=No+Image"}
             alt={product.name}
             width={400}
             height={400}
@@ -99,7 +111,7 @@ export function ProductDetailScreen({
           {product.skinType && product.skinType.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-4">
               {product.skinType.map((type) => (
-                <span 
+                <span
                   key={type}
                   className="px-2 py-1 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-xs rounded-lg"
                 >
@@ -117,7 +129,8 @@ export function ProductDetailScreen({
             </span>
           </div>
           <p className="text-sm text-green-600 dark:text-green-400">
-            ¥{(product.originalPrice - product.currentPrice).toLocaleString()}お得
+            ¥{(product.originalPrice - product.currentPrice).toLocaleString()}
+            お得
           </p>
         </div>
 
@@ -125,7 +138,9 @@ export function ProductDetailScreen({
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">販売ショップ</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
+                販売ショップ
+              </p>
               <p className="text-slate-900 dark:text-white">{product.shop}</p>
             </div>
             <a
@@ -142,26 +157,31 @@ export function ProductDetailScreen({
         {/* Price Chart */}
         {product.priceHistory && product.priceHistory.length > 0 && (
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
-            <h3 className="text-slate-900 dark:text-white mb-4">価格推移（過去30日）</h3>
+            <h3 className="text-slate-900 dark:text-white mb-4">
+              価格推移（過去30日）
+            </h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
-                  data={product.priceHistory.map(item => ({
+                  data={product.priceHistory.map((item) => ({
                     date: formatDate(item.date),
                     price: item.price,
                   }))}
                   margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-700" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    className="stroke-slate-200 dark:stroke-slate-700"
+                  />
                   <XAxis
                     dataKey="date"
                     className="text-slate-600 dark:text-slate-400"
-                    tick={{ fill: 'currentColor', fontSize: 12 }}
+                    tick={{ fill: "currentColor", fontSize: 12 }}
                   />
                   <YAxis
                     tickFormatter={formatPrice}
                     className="text-slate-600 dark:text-slate-400"
-                    tick={{ fill: 'currentColor', fontSize: 12 }}
+                    tick={{ fill: "currentColor", fontSize: 12 }}
                   />
                   <Tooltip content={<CustomTooltip />} />
                   <Line
@@ -169,7 +189,7 @@ export function ProductDetailScreen({
                     dataKey="price"
                     stroke="#f97316"
                     strokeWidth={2}
-                    dot={{ fill: '#f97316', r: 4 }}
+                    dot={{ fill: "#f97316", r: 4 }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>

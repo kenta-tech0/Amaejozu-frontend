@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { TabBar } from "@/components/TabBar";
 import type { Product } from "@/types/product";
+import type { ExternalSearchProduct } from "@/types/api";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 // 常に必要
@@ -85,8 +86,11 @@ export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
+  const [previousScreen, setPreviousScreen] = useState<Screen>("home"); 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [watchlist, setWatchlist] = useState<Product[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchProducts, setSearchProducts] = useState<ExternalSearchProduct[]>([]);
 
   // ホーム画面表示時に他の画面を先読み
   useEffect(() => {
@@ -118,13 +122,14 @@ export default function Home() {
   };
 
   const handleViewProduct = (product: Product) => {
+    setPreviousScreen(currentScreen);
     setSelectedProduct(product);
     setCurrentScreen("detail");
   };
 
   const handleBack = () => {
     setSelectedProduct(null);
-    setCurrentScreen("home");
+    setCurrentScreen(previousScreen);
   };
 
   if (!isAuthenticated) {
@@ -149,6 +154,10 @@ export default function Home() {
           onViewProduct={handleViewProduct}
           onAddToWatchlist={handleAddToWatchlist}
           watchlist={watchlist}
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          searchProducts={searchProducts}
+          onSearchProductsChange={setSearchProducts}
         />
       )}
       {currentScreen === "watchlist" && (
