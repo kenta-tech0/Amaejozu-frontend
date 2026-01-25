@@ -1,18 +1,38 @@
+'use client';
+
 import { useState } from "react";
-import { TrendingDown, Mail, Lock } from "lucide-react";
+import { TrendingDown, Mail, Lock, Loader2 } from "lucide-react";
+import { useAuth } from '@/contexts/AuthContext';
 
 interface LoginScreenProps {
-  onLogin: () => void;
+  onForgotPassword: () => void;
 }
 
-export function LoginScreen({ onLogin }: LoginScreenProps) {
-  const [isLogin, setIsLogin] = useState(true);
+export function LoginScreen({ onForgotPassword }: LoginScreenProps) {
+  const { login, signup, isLoading } = useAuth();
+  const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onLogin();
+    setError('');
+
+    // Client-side validation
+    if (password.length < 8) {
+      setError('パスワードは8文字以上で入力してください');
+      return;
+    }
+
+    const result = isLoginMode
+      ? await login(email, password)
+      : await signup(email, password);
+
+    if (!result.success && result.error) {
+      setError(result.error);
+    }
+    // On success, AuthContext updates isAuthenticated, triggering parent to show home
   };
 
   return (
@@ -34,9 +54,12 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
         {/* Tabs */}
         <div className="flex bg-slate-100 dark:bg-slate-900 rounded-2xl p-1 mb-8">
           <button
-            onClick={() => setIsLogin(true)}
+            onClick={() => {
+              setIsLoginMode(true);
+              setError('');
+            }}
             className={`flex-1 py-3 rounded-xl transition-all ${
-              isLogin
+              isLoginMode
                 ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
                 : "text-slate-600 dark:text-slate-400"
             }`}
@@ -44,9 +67,12 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             ログイン
           </button>
           <button
-            onClick={() => setIsLogin(false)}
+            onClick={() => {
+              setIsLoginMode(false);
+              setError('');
+            }}
             className={`flex-1 py-3 rounded-xl transition-all ${
-              !isLogin
+              !isLoginMode
                 ? "bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm"
                 : "text-slate-600 dark:text-slate-400"
             }`}
@@ -54,6 +80,13 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
             新規登録
           </button>
         </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-sm">
+            {error}
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4 mb-6">
@@ -70,6 +103,7 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                 placeholder="example@email.com"
                 className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -87,15 +121,30 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
                 placeholder="••••••••"
                 className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 required
+                minLength={8}
+                disabled={isLoading}
               />
             </div>
+            {!isLoginMode && (
+              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                8文字以上で入力してください
+              </p>
+            )}
           </div>
 
           <button
             type="submit"
-            className="w-full py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors"
+            disabled={isLoading}
+            className="w-full py-4 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white rounded-xl transition-colors flex items-center justify-center gap-2"
           >
-            {isLogin ? "ログイン" : "新規登録"}
+            {isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                <span>処理中...</span>
+              </>
+            ) : (
+              <span>{isLoginMode ? "ログイン" : "新規登録"}</span>
+            )}
           </button>
         </form>
 
@@ -111,12 +160,12 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           </div>
         </div>
 
-        {/* Social Login */}
+        {/* Social Login - disabled for now */}
         <div className="space-y-3">
           <button
             type="button"
-            onClick={onLogin}
-            className="w-full py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-3"
+            disabled
+            className="w-full py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -142,8 +191,8 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           </button>
           <button
             type="button"
-            onClick={onLogin}
-            className="w-full py-4 bg-slate-900 dark:bg-white border border-slate-900 dark:border-white rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors flex items-center justify-center gap-3"
+            disabled
+            className="w-full py-4 bg-slate-900 dark:bg-white border border-slate-900 dark:border-white rounded-xl hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors flex items-center justify-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg
               className="w-5 h-5 fill-current text-white dark:text-slate-900"
@@ -159,9 +208,13 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
       </div>
 
       {/* Footer */}
-      {isLogin && (
+      {isLoginMode && (
         <div className="px-6 pb-8 text-center">
-          <button className="text-sm text-orange-500 hover:underline">
+          <button
+            onClick={onForgotPassword}
+            className="text-sm text-orange-500 hover:underline"
+            disabled={isLoading}
+          >
             パスワードをお忘れの方
           </button>
         </div>

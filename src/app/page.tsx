@@ -1,16 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from 'next/navigation';
 import { TabBar } from "@/components/TabBar";
 import type { Product } from "@/types/product";
 import type { ExternalSearchProduct } from "@/types/api";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 
 // 常に必要
 import { HomeScreen } from "@/components/Home/HomeScreen";
 import { LoginScreen } from "@/components/Auth/LoginScreen";
 import { OnboardingScreen } from "@/components/Onboarding/OnboardingScreen";
+import { ForgotPasswordScreen } from '@/components/Auth/ForgotPasswordScreen';
+import { ResetPasswordScreen } from '@/components/Auth/ResetPasswordScreen';
 
 // 使う時だけ
 const SearchScreen = dynamic(
@@ -81,9 +85,12 @@ type Screen =
   | "detail"
   | "top10"
   | "notifications";
+type AuthScreen = 'login' | 'forgot-password' | 'reset-password';
 
-export default function Home() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+function AppContent() {
+  const searchParams = useSearchParams();
+  const { isAuthenticated, isLoading } = useAuth();
+
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
   const [previousScreen, setPreviousScreen] = useState<Screen>("home"); 
@@ -91,11 +98,21 @@ export default function Home() {
   const [watchlist, setWatchlist] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchProducts, setSearchProducts] = useState<ExternalSearchProduct[]>([]);
+  const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
+  const [resetToken, setResetToken] = useState<string | null>(null);
+
+  // URLパラメータからreset-passwordのトークンを取得
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token) {
+      setAuthScreen('reset-password');
+      setResetToken(token);
+    }
+  }, [searchParams]);
 
   // ホーム画面表示時に他の画面を先読み
   useEffect(() => {
     if (hasCompletedOnboarding && isAuthenticated) {
-      // よく使われる画面を先読み
       import("@/components/Search/SearchScreen");
       import("@/components/Watchlist/WatchlistScreen");
       import("@/components/Settings/SettingsScreen");
@@ -103,8 +120,21 @@ export default function Home() {
     }
   }, [hasCompletedOnboarding, isAuthenticated]);
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
+  const handleForgotPassword = () => {
+    setAuthScreen('forgot-password');
+  };
+
+
+  const handleBackToLogin = () => {
+    setAuthScreen('login');
+    setResetToken(null);
+    window.history.replaceState({}, '', '/');
+  };
+
+  const handleResetPasswordSuccess = () => {
+    setAuthScreen('login');
+    setResetToken(null);
+    window.history.replaceState({}, '', '/');
   };
 
   const handleCompleteOnboarding = () => {
@@ -141,8 +171,39 @@ export default function Home() {
     setCurrentScreen(previousScreen);
   };
 
+  // 初回ロード時（トークンがあり認証チェック中）はローディング表示
+  // ログイン/サインアップ処理中はLoginScreen内でローディングを表示
+  if (isLoading && isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+      </div>
+    );
+  }
+
+  // 未認証の場合は認証画面を表示（LoginScreen内でローディング状態を処理）
   if (!isAuthenticated) {
-    return <LoginScreen onLogin={handleLogin} />;
+    // 認証画面のルーティング
+    if (authScreen === 'login') {
+      return <LoginScreen onForgotPassword={handleForgotPassword} />;
+    }
+
+    if (authScreen === 'forgot-password') {
+      return <ForgotPasswordScreen onBack={handleBackToLogin} />;
+    }
+
+    if (authScreen === 'reset-password' && resetToken) {
+      return (
+        <ResetPasswordScreen
+          token={resetToken}
+          onSuccess={handleResetPasswordSuccess}
+          onBack={handleBackToLogin}
+        />
+      );
+    }
+
+    // Default to login
+    return <LoginScreen onForgotPassword={handleForgotPassword} />;
   }
 
   if (!hasCompletedOnboarding) {
@@ -199,3 +260,22 @@ export default function Home() {
     </div>
   );
 }
+
+function LoadingSpinner() {
+  return (
+    <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <AuthProvider>
+      <Suspense fallback={<LoadingSpinner />}>
+        <AppContent />
+      </Suspense>
+    </AuthProvider>
+  );
+}
+
