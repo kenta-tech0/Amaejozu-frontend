@@ -56,7 +56,7 @@ interface MeResponse {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
     user: null,
-    isLoading: true, // Start as loading to check auth on mount
+    isLoading: false, // Start as loading to check auth on mount
     isAuthenticated: false,
   });
 
