@@ -139,14 +139,13 @@ export function ProductDetailScreen({
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">
-                販売ショップ
-              </p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-1">販売ショップ</p>
               <p className="text-slate-900 dark:text-white">{product.shop}</p>
             </div>
             <a
-              href="#"
-              onClick={(e) => e.preventDefault()}
+              href={product.shopUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-xl transition-colors"
             >
               <span>購入する</span>
