@@ -17,6 +17,8 @@ import type {
   AddWatchlistWithProductRequest,
   AddWatchlistWithProductResponse,
   PriceHistoryResponse,
+  NotificationSettingsResponse,
+  NotificationSettingsUpdateRequest,
 } from "@/types/api";
 
 // トークン管理（認証チームが実装予定）
@@ -235,5 +237,26 @@ export const masterApi = {
   getBrands: async (): Promise<Brand[]> => {
     const response = await apiFetch<BrandsResponse>("/api/brands");
     return response.brands;
+  },
+};
+
+// 通知設定API
+export const notificationApi = {
+  getSettings: async (): Promise<NotificationSettingsResponse> => {
+    return apiFetch<NotificationSettingsResponse>(
+      "/api/user/notification-settings",
+    );
+  },
+
+  updateSettings: async (
+    settings: NotificationSettingsUpdateRequest,
+  ): Promise<NotificationSettingsResponse> => {
+    return apiFetch<NotificationSettingsResponse>(
+      "/api/user/notification-settings",
+      {
+        method: "PUT",
+        body: JSON.stringify(settings),
+      },
+    );
   },
 };

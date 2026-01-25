@@ -159,3 +159,19 @@ export interface PriceHistoryItem {
 export interface PriceHistoryResponse {
   price_history: PriceHistoryItem[];
 }
+
+// 通知設定
+export interface NotificationSettings {
+  email_notifications: boolean;
+  notification_frequency: string; // "daily" | "weekly" | "never" など
+}
+
+export interface NotificationSettingsResponse {
+  email_notifications: boolean;
+  notification_frequency: string;
+}
+
+export interface NotificationSettingsUpdateRequest {
+  email_notifications?: boolean | null;
+  notification_frequency?: string | null;
+}
