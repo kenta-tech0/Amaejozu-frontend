@@ -7,9 +7,10 @@ import Image from 'next/image';
 
 interface Top10ScreenProps {
   onViewProduct: (product: Product) => void;
+  interestedCategories: string[]; 
 }
 
-export function Top10Screen({ onViewProduct }: Top10ScreenProps) {
+export function Top10Screen({ onViewProduct, interestedCategories }: Top10ScreenProps) {
   // TODO: 後でバックエンドAPIから取得
   // const top10Products: Product[] = [];
   const top10Products: Product[] = mockProducts.slice(0, 10);
