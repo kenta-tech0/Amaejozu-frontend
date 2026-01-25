@@ -30,26 +30,42 @@ export function SearchScreen({
   // API連携用のstate
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastSearchQuery, setLastSearchQuery] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  const ITEMS_PER_PAGE = 30;
 
   useEffect(() => {
-    // キーワードが空の場合は検索しない
+    // キーワードが空の場合は検索結果をクリア
     if (!searchQuery.trim()) {
+      onSearchProductsChange([]);
+      setLastSearchQuery("");
+      setCurrentPage(1);
+      setHasMore(true);
       return;
     }
-    if (searchProducts.length > 0) {
+
+    // 前回と同じクエリの場合は検索しない（APIリクエスト削減）
+    if (searchQuery === lastSearchQuery) {
       return;
     }
 
     const fetchProducts = async () => {
       setLoading(true);
       setError(null);
+      setCurrentPage(1);
 
       try {
         const response = await productsApi.externalSearch({
           keyword: searchQuery,
-          limit: 20,
+          page: 1,
+          limit: ITEMS_PER_PAGE,
         });
         onSearchProductsChange(response.products);
+        setLastSearchQuery(searchQuery);
+        setHasMore(response.products.length === ITEMS_PER_PAGE);
       } catch (err) {
         setError(err instanceof Error ? err.message : "検索に失敗しました");
       } finally {
@@ -60,7 +76,32 @@ export function SearchScreen({
     // デバウンス：入力後500ms待ってから検索
     const timer = setTimeout(fetchProducts, 500);
     return () => clearTimeout(timer);
-  }, [searchQuery, onSearchProductsChange]);
+  }, [searchQuery, lastSearchQuery, onSearchProductsChange, ITEMS_PER_PAGE]);
+
+  const loadMoreProducts = async () => {
+    if (loadingMore || !hasMore) return;
+
+    setLoadingMore(true);
+    setError(null);
+
+    try {
+      const nextPage = currentPage + 1;
+      const response = await productsApi.externalSearch({
+        keyword: searchQuery,
+        page: nextPage,
+        limit: ITEMS_PER_PAGE,
+      });
+
+      // 既存の商品に追加
+      onSearchProductsChange([...searchProducts, ...response.products]);
+      setCurrentPage(nextPage);
+      setHasMore(response.products.length === ITEMS_PER_PAGE);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "追加読み込みに失敗しました");
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   return (
     <div className="pb-4">
@@ -218,6 +259,26 @@ export function SearchScreen({
                 );
               })}
             </div>
+
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex justify-center mt-6">
+                <button
+                  onClick={loadMoreProducts}
+                  disabled={loadingMore}
+                  className="px-6 py-3 bg-orange-500 hover:bg-orange-600 disabled:bg-slate-300 dark:disabled:bg-slate-700 text-white rounded-xl font-medium transition-colors disabled:cursor-not-allowed"
+                >
+                  {loadingMore ? (
+                    <span className="flex items-center gap-2">
+                      <LoadingSpinner />
+                      読み込み中...
+                    </span>
+                  ) : (
+                    "さらに読み込む"
+                  )}
+                </button>
+              </div>
+            )}
           </>
         )}
       </div>
