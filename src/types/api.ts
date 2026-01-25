@@ -45,6 +45,7 @@ export interface ApiProduct {
     date: string;
     price: number;
   }[];
+  image?: string;
 }
 
 export interface ProductSearchResponse {
@@ -108,13 +109,18 @@ export interface MessageResponse {
 export interface ExternalSearchProduct {
   rakuten_product_id: string;
   name: string;
-  price: number;
-  shop_name: string;
+  brand: string | null;
   image_url: string;
-  product_url: string;
+  shop_url: string;
   affiliate_url: string;
-  review_average: number;
+  current_price: number;
+  original_price: number | null;
+  review_score: number;
   review_count: number;
+  shop_name: string;
+  shop_code: string;
+  category: string | null;
+  checked_at: string;
 }
 
 export interface ExternalSearchResponse {
