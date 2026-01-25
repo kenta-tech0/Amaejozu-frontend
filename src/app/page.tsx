@@ -89,7 +89,7 @@ type AuthScreen = 'login' | 'forgot-password' | 'reset-password';
 
 function AppContent() {
   const searchParams = useSearchParams();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
 
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
@@ -238,7 +238,7 @@ function AppContent() {
       )}
       {currentScreen === "settings" && (
         <SettingsScreen
-          onLogout={() => setIsAuthenticated(false)}
+          onLogout={logout}
           onNavigateToNotifications={() => setCurrentScreen("notifications")}
         />
       )}
@@ -257,14 +257,6 @@ function AppContent() {
         />
       )}
       <TabBar currentScreen={currentScreen} onNavigate={setCurrentScreen} />
-    </div>
-  );
-}
-
-function LoadingSpinner() {
-  return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
     </div>
   );
 }
