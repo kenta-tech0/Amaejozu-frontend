@@ -127,6 +127,15 @@ export default function Home() {
     setCurrentScreen("detail");
   };
 
+  const handleViewProductById = (productId: string) => {
+    // WatchlistScreenから呼ばれる場合、productIdからProductを取得する必要がある
+    // 現時点ではwatchlistから該当商品を探す
+    const product = watchlist.find((p) => p.id === productId);
+    if (product) {
+      handleViewProduct(product);
+    }
+  };
+
   const handleBack = () => {
     setSelectedProduct(null);
     setCurrentScreen(previousScreen);
@@ -162,9 +171,7 @@ export default function Home() {
       )}
       {currentScreen === "watchlist" && (
         <WatchlistScreen
-          watchlist={watchlist}
-          onViewProduct={handleViewProduct}
-          onRemoveFromWatchlist={handleRemoveFromWatchlist}
+          onViewProduct={handleViewProductById}
           onNavigateToSearch={() => setCurrentScreen("search")}
         />
       )}

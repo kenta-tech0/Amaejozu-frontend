@@ -23,8 +23,6 @@ export function SettingsScreen({
   onLogout,
   onNavigateToNotifications,
 }: SettingsScreenProps) {
-  const [pushNotification, setPushNotification] = useState(true);
-  const [emailNotification, setEmailNotification] = useState(true);
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
@@ -88,10 +86,13 @@ export function SettingsScreen({
               通知方法
             </h2>
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden">
-              <div className="flex items-center justify-between px-4 py-4">
+              <button
+                onClick={onNavigateToNotifications}
+                className="w-full flex items-center justify-between px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
                 <div className="flex items-center gap-3">
                   <Smartphone className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                  <div>
+                  <div className="text-left">
                     <p className="text-slate-900 dark:text-white">
                       プッシュ通知
                     </p>
@@ -100,21 +101,8 @@ export function SettingsScreen({
                     </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => setPushNotification(!pushNotification)}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${
-                    pushNotification
-                      ? "bg-orange-500"
-                      : "bg-slate-300 dark:bg-slate-700"
-                  }`}
-                >
-                  <div
-                    className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                      pushNotification ? "translate-x-6" : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
-              </div>
+                <ChevronRight className="w-5 h-5 text-slate-400" />
+              </button>
               <div className="border-t border-slate-200 dark:border-slate-800" />
               <button
                 onClick={onNavigateToNotifications}
@@ -122,33 +110,14 @@ export function SettingsScreen({
               >
                 <div className="flex items-center gap-3">
                   <Mail className="w-5 h-5 text-slate-600 dark:text-slate-400" />
-                  <div>
+                  <div className="text-left">
                     <p className="text-slate-900 dark:text-white">メール通知</p>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
                       example@email.com
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setEmailNotification(!emailNotification);
-                    }}
-                    className={`relative w-12 h-6 rounded-full transition-colors ${
-                      emailNotification
-                        ? "bg-orange-500"
-                        : "bg-slate-300 dark:bg-slate-700"
-                    }`}
-                  >
-                    <div
-                      className={`absolute top-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                        emailNotification ? "translate-x-6" : "translate-x-0.5"
-                      }`}
-                    />
-                  </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400" />
-                </div>
+                <ChevronRight className="w-5 h-5 text-slate-400" />
               </button>
             </div>
           </div>

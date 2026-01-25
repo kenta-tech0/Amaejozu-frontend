@@ -1,22 +1,53 @@
-import { Product } from '../../types/product';
-import { Heart, Search, Trash2 } from 'lucide-react';
-import Image from 'next/image';
+"use client";
+
+import { useState, useEffect } from "react";
+import { Heart, Search, Trash2 } from "lucide-react";
+import Image from "next/image";
+import { watchlistApi } from "@/lib/api-client";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ErrorMessage from "@/components/common/ErrorMessage";
+import type { WatchlistItem } from "@/types/api";
 
 interface WatchlistScreenProps {
-  watchlist: Product[];
-  onViewProduct: (product: Product) => void;
-  onRemoveFromWatchlist: (productId: string) => void;
+  onViewProduct: (productId: string) => void;
   onNavigateToSearch: () => void;
 }
 
-export function WatchlistScreen({ 
-  watchlist, 
-  onViewProduct, 
-  onRemoveFromWatchlist,
-  onNavigateToSearch 
+export function WatchlistScreen({
+  onViewProduct,
+  onNavigateToSearch,
 }: WatchlistScreenProps) {
   const maxItems = 50;
+  const [watchlist, setWatchlist] = useState<WatchlistItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const currentCount = watchlist.length;
+
+  // 初期データ取得
+  useEffect(() => {
+    watchlistApi.getAll()
+      .then((items) => {
+        setWatchlist(items);
+        setError(null);
+      })
+      .catch((err) => {
+        setError(err instanceof Error ? err.message : "取得に失敗しました");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // 削除
+  const handleRemove = async (id: string) => {
+    try {
+      await watchlistApi.remove(id);
+      setWatchlist((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "削除に失敗しました");
+    }
+  };
+
+  if (loading) return <LoadingSpinner />;
+  if (error) return <ErrorMessage message={error} />;
 
   return (
     <div className="pb-4">
@@ -40,9 +71,7 @@ export function WatchlistScreen({
             <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
               <Heart className="w-10 h-10 text-slate-400" />
             </div>
-            <h3 className="text-slate-900 dark:text-white mb-2">
-              ウォッチリストが空です
-            </h3>
+            <h3 className="text-slate-900 dark:text-white mb-2">ウォッチリストが空です</h3>
             <p className="text-slate-600 dark:text-slate-400 text-center mb-6">
               気になる商品を追加して<br />価格変動を追跡しましょう
             </p>
@@ -56,20 +85,20 @@ export function WatchlistScreen({
           </div>
         ) : (
           <div className="space-y-4">
-            {watchlist.map(product => (
+            {watchlist.map((item) => (
               <div
-                key={product.id}
+                key={item.id}
                 className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 hover:border-orange-500 dark:hover:border-orange-500 transition-colors"
               >
                 <div className="flex gap-4">
                   {/* Image */}
-                  <div 
+                  <div
                     className="flex-shrink-0 cursor-pointer"
-                    onClick={() => onViewProduct(product)}
+                    onClick={() => onViewProduct(item.product.id)}
                   >
                     <Image
-                      src={product.image || 'https://placehold.co/400x400?text=No+Image'}
-                      alt={product.name}
+                      src={item.product.image_url || 'https://placehold.co/400x400?text=No+Image'}
+                      alt={item.product.name}
                       width={400}
                       height={400}
                       className="w-24 h-24 object-cover rounded-xl"
@@ -77,50 +106,40 @@ export function WatchlistScreen({
                   </div>
 
                   {/* Info */}
-                  <div 
+                  <div
                     className="flex-1 min-w-0 cursor-pointer"
-                    onClick={() => onViewProduct(product)}
+                    onClick={() => onViewProduct(item.product.id)}
                   >
                     <h3 className="text-slate-900 dark:text-white text-sm line-clamp-2 mb-2">
-                      {product.name}
+                      {item.product.name}
                     </h3>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
-                        {product.shop}
-                      </span>
-                      <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded">
-                        {product.discount}%OFF
-                      </span>
+                      {item.product.brand_name && (
+                        <span className="text-xs text-slate-500 dark:text-slate-400">{item.product.brand_name}</span>
+                      )}
+                      {item.product.discount_rate && item.product.discount_rate > 0 && (
+                        <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded">
+                          {item.product.discount_rate}%OFF
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className="text-lg text-slate-900 dark:text-white">
-                        ¥{product.currentPrice.toLocaleString()}
+                        ¥{item.product.current_price.toLocaleString()}
                       </span>
-                      <span className="text-xs text-slate-400 line-through">
-                        ¥{product.originalPrice.toLocaleString()}
-                      </span>
+                      {item.product.original_price && (
+                        <span className="text-xs text-slate-400 line-through">
+                          ¥{item.product.original_price.toLocaleString()}
+                        </span>
+                      )}
                     </div>
-                    {product.priceHistory.length >= 2 && (
-                      <div className="flex items-center gap-1 text-xs">
-                        {product.priceHistory[product.priceHistory.length - 1].price < 
-                         product.priceHistory[product.priceHistory.length - 2].price ? (
-                          <span className="text-green-600 dark:text-green-400">
-                            ↓ 値下がり中
-                          </span>
-                        ) : (
-                          <span className="text-slate-500 dark:text-slate-400">
-                            価格安定
-                          </span>
-                        )}
-                      </div>
-                    )}
                   </div>
 
                   {/* Delete Button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onRemoveFromWatchlist(product.id);
+                      handleRemove(item.id);
                     }}
                     className="flex-shrink-0 w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center"
                   >
@@ -132,17 +151,6 @@ export function WatchlistScreen({
           </div>
         )}
       </div>
-
-      {/* Info */}
-      {watchlist.length > 0 && (
-        <div className="px-6 pt-6">
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
-            <p className="text-sm text-blue-900 dark:text-blue-300">
-              <strong>ヒント:</strong> 価格が目標値まで下がったら通知でお知らせします。毎日朝6時に自動更新されます。
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
