@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Heart, Search, Trash2 } from "lucide-react";
+import { Heart, Search, Trash2, ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { watchlistApi } from "@/lib/api-client";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -135,16 +135,32 @@ export function WatchlistScreen({
                     </div>
                   </div>
 
-                  {/* Delete Button */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemove(item.id);
-                    }}
-                    className="flex-shrink-0 w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center"
-                  >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                  {/* Action Buttons */}
+                  <div className="flex-shrink-0 flex flex-col gap-2">
+                    {/* Shop Button */}
+                    {item.product.shop_url && (
+                      
+                        href={item.product.shop_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="w-10 h-10 rounded-xl bg-orange-50 dark:bg-orange-900/20 hover:bg-orange-100 dark:hover:bg-orange-900/30 text-orange-500 transition-colors flex items-center justify-center"
+                      >
+                        <ExternalLink className="w-5 h-5" />
+                      </a>
+                    )}
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemove(item.id);
+                      }}
+                      className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

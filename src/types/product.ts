@@ -7,6 +7,7 @@ export interface Product {
   originalPrice: number;
   discount: number;
   shop: string;
+  shopUrl?: string;
   category: string;
   brand?: string;
   skinType?: string[];
@@ -40,6 +41,7 @@ export function convertExternalProductToProduct(
     originalPrice: originalPrice,
     discount: discount,
     shop: apiProduct.shop_name,
+    shopUrl: apiProduct.affiliate_url || apiProduct.shop_url,
     category: apiProduct.category || '未分類',
     brand: apiProduct.brand || undefined,
     skinType: [],
