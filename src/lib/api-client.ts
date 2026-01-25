@@ -205,28 +205,6 @@ export const watchlistApi = {
   },
 };
 
-// 通知設定 API
-export const notificationApi = {
-  // 取得
-  getSettings: async (): Promise<{
-    email_notifications: boolean;
-    notification_frequency: string;
-  }> => {
-    return apiFetch("/api/user/notification-settings");
-  },
-
-  // 更新
-  updateSettings: async (params: {
-    email_notifications?: boolean;
-    notification_frequency?: "instant" | "daily" | "weekly";
-  }) => {
-    return apiFetch("/api/user/notification-settings", {
-      method: "PUT",
-      body: JSON.stringify(params),
-    });
-  },
-};
-
 // マスターデータAPI
 export const masterApi = {
   getCategories: async (): Promise<Category[]> => {

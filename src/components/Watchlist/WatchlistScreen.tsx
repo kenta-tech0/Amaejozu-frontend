@@ -25,7 +25,6 @@ export function WatchlistScreen({
 
   // 初期データ取得
   useEffect(() => {
-    setLoading(true);
     watchlistApi.getAll()
       .then((items) => {
         setWatchlist(items);
@@ -98,7 +97,7 @@ export function WatchlistScreen({
                     onClick={() => onViewProduct(item.product.id)}
                   >
                     <Image
-                      src={item.product.image || 'https://placehold.co/400x400?text=No+Image'}
+                      src={item.product.image_url || 'https://placehold.co/400x400?text=No+Image'}
                       alt={item.product.name}
                       width={400}
                       height={400}
@@ -115,18 +114,24 @@ export function WatchlistScreen({
                       {item.product.name}
                     </h3>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs text-slate-500 dark:text-slate-400">{item.product.shop}</span>
-                      <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded">
-                        {item.product.discount}%OFF
-                      </span>
+                      {item.product.brand_name && (
+                        <span className="text-xs text-slate-500 dark:text-slate-400">{item.product.brand_name}</span>
+                      )}
+                      {item.product.discount_rate && item.product.discount_rate > 0 && (
+                        <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded">
+                          {item.product.discount_rate}%OFF
+                        </span>
+                      )}
                     </div>
                     <div className="flex items-baseline gap-2 mb-2">
                       <span className="text-lg text-slate-900 dark:text-white">
-                        ¥{item.product.currentPrice.toLocaleString()}
+                        ¥{item.product.current_price.toLocaleString()}
                       </span>
-                      <span className="text-xs text-slate-400 line-through">
-                        ¥{item.product.originalPrice.toLocaleString()}
-                      </span>
+                      {item.product.original_price && (
+                        <span className="text-xs text-slate-400 line-through">
+                          ¥{item.product.original_price.toLocaleString()}
+                        </span>
+                      )}
                     </div>
                   </div>
 
