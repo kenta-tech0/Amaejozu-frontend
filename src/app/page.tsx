@@ -91,7 +91,6 @@ export default function Home() {
   const [watchlist, setWatchlist] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchProducts, setSearchProducts] = useState<ExternalSearchProduct[]>([]);
-  const [interestedCategories, setInterestedCategories] = useState<string[]>([]);
 
   // ホーム画面表示時に他の画面を先読み
   useEffect(() => {
@@ -108,8 +107,7 @@ export default function Home() {
     setIsAuthenticated(true);
   };
 
-  const handleCompleteOnboarding = (categories: string[]) => {
-    setInterestedCategories(categories);
+  const handleCompleteOnboarding = () => {
     setHasCompletedOnboarding(true);
   };
 
@@ -158,7 +156,6 @@ export default function Home() {
           onViewProduct={handleViewProduct}
           onAddToWatchlist={handleAddToWatchlist}
           watchlist={watchlist}
-          interestedCategories={interestedCategories} 
         />
       )}
       {currentScreen === "search" && (
@@ -188,7 +185,7 @@ export default function Home() {
         <NotificationsScreen onBack={() => setCurrentScreen("settings")} />
       )}
       {currentScreen === "top10" && (
-        <Top10Screen onViewProduct={handleViewProduct} interestedCategories={interestedCategories} />
+        <Top10Screen onViewProduct={handleViewProduct} />
       )}
       {currentScreen === "detail" && selectedProduct && (
         <ProductDetailScreen

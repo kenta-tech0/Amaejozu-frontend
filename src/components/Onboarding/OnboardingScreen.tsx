@@ -2,24 +2,13 @@ import { useState } from 'react';
 import { TrendingDown, Sparkles, Tag } from 'lucide-react';
 
 interface OnboardingScreenProps {
-  onComplete: (categories: string[]) => void;
+  onComplete: () => void;
 }
 
 const categories = [
-  // 基本スキンケア (4)
-  '洗顔料', '化粧水', '乳液・クリーム', 'オールインワン',
-  
-  // エイジングケア (2)
-  '美容液', 'アイケア',
-  
-  // メンズ特有 (2)
-  'シェービング', 'デオドラント',
-  
-  // ヘアケア (2)
-  'ヘアワックス・ジェル', 'シャンプー・コンディショナー',
-  
-  // その他 (2)
-  '日焼け止め', '香水・フレグランス'
+  '化粧水', '乳液・クリーム', '美容液', 'クレンジング',
+  '洗顔料', 'パック・マスク', 'アイケア', 'リップケア',
+  '日焼け止め', 'オールインワン', 'ボディケア', 'ヘアケア'
 ];
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
@@ -38,13 +27,13 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     if (currentPage < 2) {
       setCurrentPage(currentPage + 1);
     } else {
-      onComplete(selectedCategories);
+      onComplete();
     }
   };
 
   const handleSkip = () => {
     if (currentPage === 2) {
-      onComplete(selectedCategories);
+      onComplete();
     } else {
       setCurrentPage(2);
     }
