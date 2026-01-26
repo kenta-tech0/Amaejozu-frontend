@@ -98,6 +98,7 @@ function AppContent() {
   const [watchlist, setWatchlist] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchProducts, setSearchProducts] = useState<ExternalSearchProduct[]>([]);
+  const [interestedCategories, setInterestedCategories] = useState<string[]>([]);
   const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
   const [resetToken, setResetToken] = useState<string | null>(null);
 
@@ -141,7 +142,8 @@ function AppContent() {
     window.history.replaceState({}, '', '/');
   };
 
-  const handleCompleteOnboarding = () => {
+  const handleCompleteOnboarding = (categories: string[]) => {
+    setInterestedCategories(categories);
     setHasCompletedOnboarding(true);
   };
 
@@ -221,6 +223,7 @@ function AppContent() {
           onViewProduct={handleViewProduct}
           onAddToWatchlist={handleAddToWatchlist}
           watchlist={watchlist}
+          interestedCategories={interestedCategories}
         />
       )}
       {currentScreen === "search" && (
