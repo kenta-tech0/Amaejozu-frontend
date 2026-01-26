@@ -90,10 +90,9 @@ type AuthScreen = 'login' | 'forgot-password' | 'reset-password';
 function AppContent() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading, logout } = useAuth();
-
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
-  const [previousScreen, setPreviousScreen] = useState<Screen>("home"); 
+  const [previousScreen, setPreviousScreen] = useState<Screen>("home");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [watchlist, setWatchlist] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");

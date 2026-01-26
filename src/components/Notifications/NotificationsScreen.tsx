@@ -5,45 +5,29 @@ import { ArrowLeft, Mail, Clock, Bell } from "lucide-react";
 import { notificationApi } from "@/lib/api-client";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorMessage from "@/components/common/ErrorMessage";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface NotificationsScreenProps {
   onBack: () => void;
 }
 
 export function NotificationsScreen({ onBack }: NotificationsScreenProps) {
+  const { user } = useAuth();
   const [emailNotification, setEmailNotification] = useState(true);
   const [frequency, setFrequency] = useState<"daily" | "weekly">("daily");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
-  // モックの通知履歴データ
-  const notificationHistory = [
-    {
-      id: 1,
-      date: "2時間前",
-      product: "オーガニック化粧水",
-      discount: "15%OFF",
-      oldPrice: 3980,
-      newPrice: 3383,
-    },
-    {
-      id: 2,
-      date: "昨日",
-      product: "美容液セット",
-      discount: "20%OFF",
-      oldPrice: 5800,
-      newPrice: 4640,
-    },
-    {
-      id: 3,
-      date: "3日前",
-      product: "保湿クリーム",
-      discount: "10%OFF",
-      oldPrice: 2400,
-      newPrice: 2160,
-    },
-  ];
+  // TODO: バックエンドに通知履歴APIが追加されたら実装
+  const notificationHistory: {
+    id: number;
+    date: string;
+    product: string;
+    discount: string;
+    oldPrice: number;
+    newPrice: number;
+  }[] = [];
 
   // 初期設定を取得
   useEffect(() => {
@@ -120,7 +104,7 @@ export function NotificationsScreen({ onBack }: NotificationsScreenProps) {
                 <div>
                   <p className="text-slate-900 dark:text-white">メール通知</p>
                   <p className="text-sm text-slate-500 dark:text-slate-400">
-                    example@email.com
+                    {user?.email || "example@email.com"}
                   </p>
                 </div>
               </div>

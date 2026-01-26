@@ -26,6 +26,9 @@ import type {
   User,
 } from "@/types/auth";
 
+// APIベースURL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+
 // トークン管理（認証チームが実装予定）
 const TOKEN_KEY = "auth_token";
 
@@ -73,6 +76,7 @@ async function apiFetch<T>(
     (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
   }
 
+  const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`;
   const response = await fetch(endpoint, {
     ...options,
     headers,
