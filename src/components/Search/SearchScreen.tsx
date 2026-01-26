@@ -23,6 +23,7 @@ const popularKeywords = [
 interface SearchScreenProps {
   onViewProduct: (product: Product) => void;
   onAddToWatchlist: (product: Product) => void;
+  onAddExternalToWatchlist: (product: ExternalSearchProduct) => void;
   watchlist: Product[];
   searchQuery: string;
   onSearchQueryChange: (query: string) => void;
@@ -33,6 +34,7 @@ interface SearchScreenProps {
 export function SearchScreen({
   onViewProduct,
   onAddToWatchlist,
+  onAddExternalToWatchlist,
   watchlist,
   searchQuery,
   onSearchQueryChange,
@@ -241,9 +243,7 @@ export function SearchScreen({
                           onClick={(e) => {
                             e.stopPropagation();
                             if (!isInWatchlist)
-                              onAddToWatchlist(
-                                convertExternalProductToProduct(searchProducts),
-                              );
+                              onAddExternalToWatchlist(searchProducts);
                           }}
                           disabled={isInWatchlist}
                           className={`w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm transition-colors ${
