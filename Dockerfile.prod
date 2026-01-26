@@ -14,6 +14,10 @@ RUN npm ci
 # ソースコードをコピー
 COPY . .
 
+# ビルド時の環境変数を受け取る
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Next.jsアプリをビルド
 RUN npm run build
 
