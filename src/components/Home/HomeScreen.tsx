@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Product } from "@/types/product";
-import type { ExternalSearchProduct } from "@/types/api";
+import { Product, convertExternalProductToProduct } from "@/types/product";
 import { productsApi } from "@/lib/api-client";
 import { Plus, TrendingDown, Sparkles } from "lucide-react";
 import Image from "next/image";
@@ -12,33 +11,6 @@ interface HomeScreenProps {
   onAddToWatchlist: (product: Product) => void;
   watchlist: Product[];
   interestedCategories: string[];
-}
-
-// ExternalSearchProduct → Product 変換関数
-function convertToProduct(apiProduct: ExternalSearchProduct): Product {
-  const originalPrice = apiProduct.original_price || apiProduct.current_price;
-  const discount = apiProduct.original_price
-    ? Math.round(
-        ((apiProduct.original_price - apiProduct.current_price) /
-          apiProduct.original_price) *
-          100
-      )
-    : 0;
-
-  return {
-    id: apiProduct.rakuten_product_id,
-    name: apiProduct.name,
-    image: apiProduct.image_url,
-    currentPrice: apiProduct.current_price,
-    originalPrice: originalPrice,
-    discount: discount,
-    shop: apiProduct.shop_name,
-    category: apiProduct.category || "未分類",
-    brand: apiProduct.brand || undefined,
-    skinType: [],
-    aiReason: undefined,
-    priceHistory: [],
-  };
 }
 
 export function HomeScreen({
@@ -83,7 +55,7 @@ export function HomeScreen({
         const allProducts: Product[] = responses.flatMap((response) =>
           response.products
             .slice(0, productsPerCategory)
-            .map(convertToProduct)
+            .map(convertExternalProductToProduct)
         );
 
         setRecommendedProducts(allProducts.slice(0, 10));
