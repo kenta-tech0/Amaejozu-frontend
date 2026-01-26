@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Bell,
   Mail,
@@ -23,8 +24,13 @@ export function SettingsScreen({
   onLogout,
   onNavigateToNotifications,
 }: SettingsScreenProps) {
+  const { user, logout } = useAuth();
   const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const handleLogout = async () => {
+    await logout();
+    onLogout();
+  };
 
   return (
     <>
@@ -54,11 +60,7 @@ export function SettingsScreen({
               </button>
               <div className="border-t border-slate-200 dark:border-slate-800" />
               <button
-                onClick={() => {
-                  // TODO: バックエンドAPIと連携
-                  console.log("ログアウト実行");
-                  onLogout();
-                }}
+                onClick={handleLogout}
                 className="w-full flex items-center gap-3 px-4 py-4 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
               >
                 <LogOut className="w-5 h-5 text-slate-600 dark:text-slate-400" />
@@ -113,7 +115,7 @@ export function SettingsScreen({
                   <div className="text-left">
                     <p className="text-slate-900 dark:text-white">メール通知</p>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      example@email.com
+                      {user?.email || "example@email.com"}
                     </p>
                   </div>
                 </div>
@@ -201,8 +203,10 @@ export function SettingsScreen({
         </div>
       </div>
       <ProfileEditDialog
+        key={isProfileDialogOpen ? user?.id : "closed"}
         open={isProfileDialogOpen}
         onOpenChange={setIsProfileDialogOpen}
+        user={user}
       />
       <DeleteAccountDialog
         open={isDeleteDialogOpen}

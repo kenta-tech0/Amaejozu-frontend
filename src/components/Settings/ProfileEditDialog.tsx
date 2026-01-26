@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { User } from "@/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -13,15 +14,16 @@ import {
 interface ProfileEditDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  user: User | null;
 }
 
 export function ProfileEditDialog({
   open,
   onOpenChange,
+  user,
 }: ProfileEditDialogProps) {
-  const [name, setName] = useState("山田太郎");
-  const [bio, setBio] = useState("コスメ好きです！");
-  const [email, setEmail] = useState("example@email.com");
+  const [nickname, setNickname] = useState(user?.nickname || "");
+  const [email, setEmail] = useState(user?.email || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -31,17 +33,15 @@ export function ProfileEditDialog({
     // パスワード一致チェック
     if (newPassword && confirmPassword && newPassword !== confirmPassword) {
       setShowPasswordError(true);
-      return; // 保存しない
+      return;
     }
 
     // TODO: バックエンドAPIと連携
     console.log("保存:", {
-      name,
-      bio,
+      nickname,
       email,
       currentPassword,
       newPassword,
-      // confirmPassword は送らない
     });
 
     setShowPasswordError(false);
@@ -57,39 +57,21 @@ export function ProfileEditDialog({
         </DialogHeader>
 
         <div className="space-y-4 py-4 overflow-y-auto max-h-[60vh] px-1">
-          {/* 名前入力 */}
+          {/* ニックネーム入力 */}
           <div className="space-y-2">
             <label
-              htmlFor="name"
+              htmlFor="nickname"
               className="text-sm font-medium text-slate-900 dark:text-white"
             >
-              名前
+              ニックネーム
             </label>
             <input
-              id="name"
+              id="nickname"
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
               className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-              placeholder="名前を入力"
-            />
-          </div>
-
-          {/* 自己紹介 */}
-          <div className="space-y-2">
-            <label
-              htmlFor="bio"
-              className="text-sm font-medium text-slate-900 dark:text-white"
-            >
-              自己紹介
-            </label>
-            <textarea
-              id="bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              rows={3}
-              className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 resize-none"
-              placeholder="自己紹介を入力"
+              placeholder="ニックネームを入力"
             />
           </div>
 
@@ -169,7 +151,6 @@ export function ProfileEditDialog({
                 className="w-full px-3 py-2 border border-slate-200 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                 placeholder="パスワードを再入力"
               />
-              {/* エラーメッセージ */}
               {showPasswordError && (
                 <p className="text-sm text-red-500">パスワードが一致しません</p>
               )}

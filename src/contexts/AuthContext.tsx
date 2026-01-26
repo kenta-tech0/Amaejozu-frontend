@@ -7,7 +7,7 @@ import { apiClient, ApiError } from '@/lib/api';
 export interface User {
   id: string;
   email: string;
-  name?: string;
+  nickname?: string;
 }
 
 // Auth state
