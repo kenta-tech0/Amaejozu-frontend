@@ -21,6 +21,11 @@ import type {
   NotificationSettingsUpdateRequest,
 } from "@/types/api";
 
+import type {
+  AuthResponse,
+  User,
+} from "@/types/auth";
+
 // トークン管理（認証チームが実装予定）
 const TOKEN_KEY = "auth_token";
 
@@ -236,5 +241,66 @@ export const notificationApi = {
         body: JSON.stringify(settings),
       },
     );
+  },
+};
+
+// 認証API
+export const authApi = {
+  // ログイン
+  login: async (email: string, password: string): Promise<AuthResponse> => {
+    const response = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new ApiClientError(response.status, data.detail || "ログインに失敗しました");
+    }
+
+    // トークンを保存
+    if (data.token) {
+      tokenManager.setToken(data.token);
+    }
+
+    return data;
+  },
+
+  // サインアップ
+  signup: async (email: string, password: string, nickname: string): Promise<AuthResponse> => {
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password, nickname }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new ApiClientError(response.status, data.detail || "サインアップに失敗しました");
+    }
+
+    // トークンを保存
+    if (data.token) {
+      tokenManager.setToken(data.token);
+    }
+
+    return data;
+  },
+
+  // ユーザー情報取得
+  me: async (): Promise<User> => {
+    return apiFetch<User>("/api/auth/me");
+  },
+
+  // ログアウト
+  logout: (): void => {
+    tokenManager.removeToken();
   },
 };
