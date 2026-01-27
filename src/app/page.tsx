@@ -297,7 +297,7 @@ function AppContent() {
       )}
       {currentScreen === "watchlist" && (
         <WatchlistScreen
-          onViewProduct={handleViewProductById}
+          onViewProduct={handleViewProduct}
           onNavigateToSearch={() => setCurrentScreen("search")}
         />
       )}
