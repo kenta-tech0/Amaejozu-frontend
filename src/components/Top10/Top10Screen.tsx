@@ -1,8 +1,9 @@
 'use client';
 
-import { Product } from '@/types/product';
-import { TrendingUp, Sparkles } from 'lucide-react';
-import { mockProducts } from '@/lib/mock-data';
+import { useState, useEffect } from 'react';
+import { Product, convertRankingItemToProduct } from '@/types/product';
+import { TrendingUp, Sparkles, Loader2 } from 'lucide-react';
+import { rankingApi } from '@/lib/api-client';
 import Image from 'next/image';
 
 interface Top10ScreenProps {
@@ -10,9 +11,30 @@ interface Top10ScreenProps {
 }
 
 export function Top10Screen({ onViewProduct }: Top10ScreenProps) {
-  // TODO: 後でバックエンドAPIから取得
-  // const top10Products: Product[] = [];
-  const top10Products: Product[] = mockProducts.slice(0, 10);
+  const [top10Products, setTop10Products] = useState<Product[]>([]);
+  const [weekLabel, setWeekLabel] = useState<string>('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTop10 = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const response = await rankingApi.getWeeklyRanking();
+        const products = response.rankings.map(convertRankingItemToProduct);
+        setTop10Products(products);
+        setWeekLabel(response.week_label);
+      } catch (err) {
+        console.error('Top10取得エラー:', err);
+        setError('ランキングの取得に失敗しました');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTop10();
+  }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -22,12 +44,24 @@ export function Top10Screen({ onViewProduct }: Top10ScreenProps) {
           <TrendingUp className="w-6 h-6" />
           <h1 className="text-2xl font-bold">週間TOP10</h1>
         </div>
-        <p className="text-white/90 text-sm">今週の人気商品</p>
+        <p className="text-white/90 text-sm">
+          {weekLabel ? `${weekLabel} の人気商品` : '今週の人気商品'}
+        </p>
       </div>
 
       {/* Content */}
       <div className="px-6 py-6 space-y-4">
-        {top10Products.length === 0 ? (
+        {isLoading ? (
+          <div className="text-center py-16">
+            <Loader2 className="w-12 h-12 mx-auto text-orange-500 mb-4 animate-spin" />
+            <p className="text-slate-500">ランキングを読み込み中...</p>
+          </div>
+        ) : error ? (
+          <div className="text-center py-16">
+            <Sparkles className="w-12 h-12 mx-auto text-slate-300 mb-4" />
+            <p className="text-slate-500">{error}</p>
+          </div>
+        ) : top10Products.length === 0 ? (
           <div className="text-center py-16">
             <Sparkles className="w-12 h-12 mx-auto text-slate-300 mb-4" />
             <p className="text-slate-500">週間TOP10を準備中です</p>
