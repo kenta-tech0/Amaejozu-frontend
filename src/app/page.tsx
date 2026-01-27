@@ -10,6 +10,7 @@ import type { ExternalSearchProduct } from "@/types/api";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { watchlistApi } from '@/lib/api-client';
+import { TargetPriceDialog } from "@/components/common/TargetPriceDialog";
 
 // 常に必要
 import { HomeScreen } from "@/components/Home/HomeScreen";
@@ -110,6 +111,13 @@ function AppContent() {
   const [resetToken, setResetToken] = useState<string | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
 
+  // 目標価格ダイアログ用のstate
+  const [pendingProduct, setPendingProduct] = useState<ExternalSearchProduct | null>(null);
+  const [showTargetPriceDialog, setShowTargetPriceDialog] = useState(false);
+  
+  // 詳細画面表示中の外部商品（APIに送信するため）
+  const [selectedExternalProduct, setSelectedExternalProduct] = useState<ExternalSearchProduct | null>(null);
+
   // LocalStorageから状態を復元
   useEffect(() => {
     const savedOnboarding = localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
@@ -178,14 +186,34 @@ function AppContent() {
     }
   };
 
-  // 外部検索商品をウォッチリストに追加（APIに保存してDBから再取得）
+  // 外部検索商品をウォッチリストに追加（ダイアログを表示）
   const handleAddExternalToWatchlist = async (externalProduct: ExternalSearchProduct) => {
     if (watchlist.length >= 50 || watchlist.find((p) => p.id === externalProduct.rakuten_product_id)) {
       return;
     }
+    // ダイアログを表示するために商品を保存
+    setPendingProduct(externalProduct);
+    setShowTargetPriceDialog(true);
+  };
+
+  // ダイアログで確定した後の実際の追加処理
+  const handleConfirmAddToWatchlist = async (targetPrice: number | null) => {
+    if (!pendingProduct) return;
+
     try {
-      await watchlistApi.addWithProduct(externalProduct);
-      // DBから最新のウォッチリストを再取得
+      await watchlistApi.addWithProduct(pendingProduct, targetPrice ?? undefined);
+    } catch (error) {
+      console.error("ウォッチリスト追加エラー:", error);
+      // 重複エラーの場合は警告だけ出してダイアログは閉じる
+      if (error instanceof Error && error.message.includes("既に")) {
+        console.warn("商品は既にウォッチリストに存在します");
+      } else {
+        alert(`ウォッチリストへの追加に失敗しました: ${error instanceof Error ? error.message : "不明なエラー"}`);
+      }
+    }
+
+    // 成功・失敗に関わらずDBから最新のウォッチリストを再取得
+    try {
       const items = await watchlistApi.getAll();
       const products: Product[] = items.map((item) => ({
         id: item.product.id,
@@ -200,13 +228,35 @@ function AppContent() {
         priceHistory: [],
       }));
       setWatchlist(products);
-    } catch (error) {
-      console.error("ウォッチリスト追加エラー:", error);
-      if (error instanceof Error) {
-        alert(`ウォッチリストへの追加に失敗しました: ${error.message}`);
-      } else {
-        alert("ウォッチリストへの追加に失敗しました");
-      }
+    } catch (fetchError) {
+      console.error("ウォッチリスト取得エラー:", fetchError);
+    }
+
+    // ダイアログを閉じてpendingをクリア
+    setShowTargetPriceDialog(false);
+    setPendingProduct(null);
+  };
+
+  // ダイアログキャンセル
+  const handleCancelTargetPriceDialog = () => {
+    setShowTargetPriceDialog(false);
+    setPendingProduct(null);
+  };
+
+  // ProductDetailScreenからのウォッチリスト追加（ダイアログを表示）
+  const handleAddToWatchlistFromDetail = (product: Product) => {
+    // 既にウォッチリストに存在する場合は何もしない
+    if (watchlist.find((p) => p.id === product.id)) {
+      return;
+    }
+    
+    if (selectedExternalProduct) {
+      // 外部検索商品の場合はダイアログを表示
+      setPendingProduct(selectedExternalProduct);
+      setShowTargetPriceDialog(true);
+    } else {
+      // 内部商品の場合は従来の処理（ローカルstateのみ）
+      handleAddToWatchlist(product);
     }
   };
 
@@ -214,9 +264,18 @@ function AppContent() {
     setWatchlist(watchlist.filter((p) => p.id !== productId));
   };
 
-  const handleViewProduct = (product: Product) => {
+  const handleViewProduct = (product: Product, externalProduct?: ExternalSearchProduct) => {
     setPreviousScreen(currentScreen);
     setSelectedProduct(product);
+    
+    // 外部商品が直接渡された場合はそれを使用、なければsearchProductsから探す
+    if (externalProduct) {
+      setSelectedExternalProduct(externalProduct);
+    } else {
+      const foundExternalProduct = searchProducts.find(p => p.rakuten_product_id === product.id);
+      setSelectedExternalProduct(foundExternalProduct || null);
+    }
+    
     setCurrentScreen("detail");
   };
 
@@ -231,6 +290,7 @@ function AppContent() {
 
   const handleBack = () => {
     setSelectedProduct(null);
+    setSelectedExternalProduct(null);
     setCurrentScreen(previousScreen);
   };
 
@@ -279,6 +339,7 @@ function AppContent() {
         <HomeScreen
           onViewProduct={handleViewProduct}
           onAddToWatchlist={handleAddToWatchlist}
+          onAddExternalToWatchlist={handleAddExternalToWatchlist}
           watchlist={watchlist}
           interestedCategories={interestedCategories}
         />
@@ -317,11 +378,21 @@ function AppContent() {
         <ProductDetailScreen
           product={selectedProduct}
           onBack={handleBack}
-          onAddToWatchlist={handleAddToWatchlist}
+          onAddToWatchlist={handleAddToWatchlistFromDetail}
           isInWatchlist={!!watchlist.find((p) => p.id === selectedProduct.id)}
         />
       )}
       <TabBar currentScreen={currentScreen} onNavigate={setCurrentScreen} />
+
+      {/* 目標価格ダイアログ */}
+      {showTargetPriceDialog && pendingProduct && (
+        <TargetPriceDialog
+          productName={pendingProduct.name}
+          currentPrice={pendingProduct.current_price}
+          onConfirm={handleConfirmAddToWatchlist}
+          onCancel={handleCancelTargetPriceDialog}
+        />
+      )}
     </div>
   );
 }
@@ -335,4 +406,3 @@ export default function Home() {
     </AuthProvider>
   );
 }
-

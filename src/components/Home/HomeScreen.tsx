@@ -5,10 +5,12 @@ import { Product, convertExternalProductToProduct } from "@/types/product";
 import { productsApi } from "@/lib/api-client";
 import { Plus, TrendingDown, Sparkles } from "lucide-react";
 import Image from "next/image";
+import type { ExternalSearchProduct } from "@/types/api";
 
 interface HomeScreenProps {
-  onViewProduct: (product: Product) => void;
+  onViewProduct: (product: Product, externalProduct?: ExternalSearchProduct) => void;
   onAddToWatchlist: (product: Product) => void;
+  onAddExternalToWatchlist: (product: ExternalSearchProduct) => void;
   watchlist: Product[];
   interestedCategories: string[];
 }
@@ -16,10 +18,12 @@ interface HomeScreenProps {
 export function HomeScreen({
   onViewProduct,
   onAddToWatchlist,
+  onAddExternalToWatchlist,
   watchlist,
   interestedCategories,
 }: HomeScreenProps) {
   const [recommendedProducts, setRecommendedProducts] = useState<Product[]>([]);
+  const [externalProducts, setExternalProducts] = useState<ExternalSearchProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -52,13 +56,18 @@ export function HomeScreen({
 
         const responses = await Promise.all(promises);
 
-        const allProducts: Product[] = responses.flatMap((response) =>
-          response.products
-            .slice(0, productsPerCategory)
-            .map(convertExternalProductToProduct)
+        // 元のExternalSearchProductを保持
+        const allExternalProducts: ExternalSearchProduct[] = responses.flatMap((response) =>
+          response.products.slice(0, productsPerCategory)
         );
+        setExternalProducts(allExternalProducts.slice(0, 10));
 
-        setRecommendedProducts(allProducts.slice(0, 10));
+        // 表示用にProductに変換
+        const allProducts: Product[] = allExternalProducts
+          .slice(0, 10)
+          .map(convertExternalProductToProduct);
+
+        setRecommendedProducts(allProducts);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "商品の取得に失敗しました"
@@ -70,6 +79,17 @@ export function HomeScreen({
 
     fetchRecommendedProducts();
   }, [interestedCategories]);
+
+  // +ボタンクリック時の処理
+  const handleAddClick = (product: Product, index: number) => {
+    const externalProduct = externalProducts[index];
+    if (externalProduct) {
+      onAddExternalToWatchlist(externalProduct);
+    } else {
+      // フォールバック（通常は起きない）
+      onAddToWatchlist(product);
+    }
+  };
 
   return (
     <div className="pb-4">
@@ -130,7 +150,7 @@ export function HomeScreen({
                 <div
                   key={product.id}
                   className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 hover:border-orange-500 dark:hover:border-orange-500 transition-colors cursor-pointer"
-                  onClick={() => onViewProduct(product)}
+                  onClick={() => onViewProduct(product, externalProducts[index])}
                 >
                   <div className="flex gap-4 items-start">
                     {/* Rank */}
@@ -206,7 +226,7 @@ export function HomeScreen({
                         onClick={(e) => {
                           e.stopPropagation();
                           if (!isInWatchlist) {
-                            onAddToWatchlist(product);
+                            handleAddClick(product, index);
                           }
                         }}
                         disabled={isInWatchlist}
