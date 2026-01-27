@@ -323,7 +323,7 @@ export const authApi = {
 
   // ユーザー情報取得
   me: async (): Promise<User> => {
-    return apiFetch<User>("/api/auth/me");
+    return apiFetch<User>("/auth/me");
   },
 
   // ログアウト
