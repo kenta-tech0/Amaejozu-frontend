@@ -5,9 +5,11 @@ import dynamic from "next/dynamic";
 import { useSearchParams } from 'next/navigation';
 import { TabBar } from "@/components/TabBar";
 import type { Product } from "@/types/product";
+import { convertExternalProductToProduct } from "@/types/product";
 import type { ExternalSearchProduct } from "@/types/api";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
+import { watchlistApi } from '@/lib/api-client';
 
 // 常に必要
 import { HomeScreen } from "@/components/Home/HomeScreen";
@@ -90,10 +92,9 @@ type AuthScreen = 'login' | 'forgot-password' | 'reset-password';
 function AppContent() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading, logout } = useAuth();
-
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false);
   const [currentScreen, setCurrentScreen] = useState<Screen>("home");
-  const [previousScreen, setPreviousScreen] = useState<Screen>("home"); 
+  const [previousScreen, setPreviousScreen] = useState<Screen>("home");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [watchlist, setWatchlist] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -148,6 +149,38 @@ function AppContent() {
   const handleAddToWatchlist = (product: Product) => {
     if (watchlist.length < 50 && !watchlist.find((p) => p.id === product.id)) {
       setWatchlist([...watchlist, product]);
+    }
+  };
+
+  // 外部検索商品をウォッチリストに追加（APIに保存してDBから再取得）
+  const handleAddExternalToWatchlist = async (externalProduct: ExternalSearchProduct) => {
+    if (watchlist.length >= 50 || watchlist.find((p) => p.id === externalProduct.rakuten_product_id)) {
+      return;
+    }
+    try {
+      await watchlistApi.addWithProduct(externalProduct);
+      // DBから最新のウォッチリストを再取得
+      const items = await watchlistApi.getAll();
+      const products: Product[] = items.map((item) => ({
+        id: item.product.id,
+        name: item.product.name,
+        image: item.product.image_url || "",
+        currentPrice: item.product.current_price,
+        originalPrice: item.product.original_price || item.product.current_price,
+        discount: item.product.discount_rate || 0,
+        shop: "",
+        category: item.product.category_name || "未分類",
+        brand: item.product.brand_name || undefined,
+        priceHistory: [],
+      }));
+      setWatchlist(products);
+    } catch (error) {
+      console.error("ウォッチリスト追加エラー:", error);
+      if (error instanceof Error) {
+        alert(`ウォッチリストへの追加に失敗しました: ${error.message}`);
+      } else {
+        alert("ウォッチリストへの追加に失敗しました");
+      }
     }
   };
 
@@ -227,6 +260,7 @@ function AppContent() {
         <SearchScreen
           onViewProduct={handleViewProduct}
           onAddToWatchlist={handleAddToWatchlist}
+          onAddExternalToWatchlist={handleAddExternalToWatchlist}
           watchlist={watchlist}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}

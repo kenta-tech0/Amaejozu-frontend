@@ -181,3 +181,4 @@ export interface NotificationSettingsUpdateRequest {
   email_notifications?: boolean | null;
   notification_frequency?: string | null;
 }
+

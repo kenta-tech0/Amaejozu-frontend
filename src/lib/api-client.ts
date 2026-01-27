@@ -21,6 +21,14 @@ import type {
   NotificationSettingsUpdateRequest,
 } from "@/types/api";
 
+import type {
+  AuthResponse,
+  User,
+} from "@/types/auth";
+
+// APIベースURL
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
+
 // トークン管理（認証チームが実装予定）
 const TOKEN_KEY = "auth_token";
 
@@ -68,7 +76,8 @@ async function apiFetch<T>(
     (headers as Record<string, string>)["Authorization"] = `Bearer ${token}`;
   }
 
-  const response = await fetch(endpoint, {
+  const url = endpoint.startsWith("http") ? endpoint : `${API_BASE_URL}${endpoint}`;
+  const response = await fetch(url, {
     ...options,
     headers,
   });
@@ -81,10 +90,16 @@ async function apiFetch<T>(
   const data = await response.json();
 
   if (!response.ok) {
-    throw new ApiClientError(
-      response.status,
-      data.detail || "エラーが発生しました",
-    );
+    let errorMessage = "エラーが発生しました";
+    if (data.detail) {
+      if (typeof data.detail === "string") {
+        errorMessage = data.detail;
+      } else {
+        // FastAPIのバリデーションエラーなどオブジェクトの場合
+        errorMessage = JSON.stringify(data.detail);
+      }
+    }
+    throw new ApiClientError(response.status, errorMessage);
   }
 
   return data as T;
@@ -182,7 +197,22 @@ export const watchlistApi = {
     product: ExternalSearchProduct,
     targetPrice?: number,
   ): Promise<AddWatchlistWithProductResponse> => {
-    const body: AddWatchlistWithProductRequest = { product };
+    // バックエンドのProductDataスキーマに合わせてフィールド名を変換
+    const productForBackend = {
+      rakuten_product_id: product.rakuten_product_id,
+      name: product.name,
+      price: product.current_price, // current_price -> price
+      shop_name: product.shop_name,
+      shop_code: product.shop_code,
+      image_url: product.image_url,
+      product_url: product.shop_url, // shop_url -> product_url
+      affiliate_url: product.affiliate_url,
+      review_average: product.review_score, // review_score -> review_average
+      review_count: product.review_count,
+    };
+    const body: { product: typeof productForBackend; target_price?: number } = {
+      product: productForBackend,
+    };
     if (targetPrice !== undefined) {
       body.target_price = targetPrice;
     }
@@ -236,5 +266,68 @@ export const notificationApi = {
         body: JSON.stringify(settings),
       },
     );
+  },
+};
+
+// 認証API
+export const authApi = {
+  // ログイン
+  login: async (email: string, password: string): Promise<AuthResponse> => {
+    const url = `${API_BASE_URL}/auth/login`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new ApiClientError(response.status, data.detail || "ログインに失敗しました");
+    }
+
+    // トークンを保存
+    if (data.token) {
+      tokenManager.setToken(data.token);
+    }
+
+    return data;
+  },
+
+  // サインアップ
+  signup: async (email: string, password: string, nickname: string): Promise<AuthResponse> => {
+    const url = `${API_BASE_URL}/auth/signup`;
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password, nickname }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new ApiClientError(response.status, data.detail || "サインアップに失敗しました");
+    }
+
+    // トークンを保存
+    if (data.token) {
+      tokenManager.setToken(data.token);
+    }
+
+    return data;
+  },
+
+  // ユーザー情報取得
+  me: async (): Promise<User> => {
+    return apiFetch<User>("/auth/me");
+  },
+
+  // ログアウト
+  logout: (): void => {
+    tokenManager.removeToken();
   },
 };
