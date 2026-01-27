@@ -19,6 +19,7 @@ import type {
   PriceHistoryResponse,
   NotificationSettingsResponse,
   NotificationSettingsUpdateRequest,
+  WeeklyRankingResponse,
 } from "@/types/api";
 
 import type {
@@ -266,6 +267,24 @@ export const notificationApi = {
         body: JSON.stringify(settings),
       },
     );
+  },
+};
+
+// ランキングAPI
+export const rankingApi = {
+  // 週間TOP10ランキング取得
+  getWeeklyRanking: async (
+    year?: number,
+    week?: number,
+  ): Promise<WeeklyRankingResponse> => {
+    const searchParams = new URLSearchParams();
+    if (year !== undefined) searchParams.set("year", String(year));
+    if (week !== undefined) searchParams.set("week", String(week));
+
+    const queryString = searchParams.toString();
+    const url = `/api/rankings/weekly${queryString ? `?${queryString}` : ""}`;
+
+    return apiFetch<WeeklyRankingResponse>(url);
   },
 };
 
