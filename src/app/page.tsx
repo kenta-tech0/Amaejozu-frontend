@@ -89,6 +89,12 @@ type Screen =
   | "notifications";
 type AuthScreen = 'login' | 'forgot-password' | 'reset-password';
 
+// LocalStorage keys
+const STORAGE_KEYS = {
+  ONBOARDING_COMPLETED: 'amaejozu_onboarding_completed',
+  INTERESTED_CATEGORIES: 'amaejozu_interested_categories',
+} as const;
+
 function AppContent() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading, logout } = useAuth();
@@ -99,8 +105,28 @@ function AppContent() {
   const [watchlist, setWatchlist] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchProducts, setSearchProducts] = useState<ExternalSearchProduct[]>([]);
+  const [interestedCategories, setInterestedCategories] = useState<string[]>([]);
   const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
   const [resetToken, setResetToken] = useState<string | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // LocalStorageから状態を復元
+  useEffect(() => {
+    const savedOnboarding = localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETED);
+    const savedCategories = localStorage.getItem(STORAGE_KEYS.INTERESTED_CATEGORIES);
+
+    if (savedOnboarding === 'true') {
+      setHasCompletedOnboarding(true);
+    }
+    if (savedCategories) {
+      try {
+        setInterestedCategories(JSON.parse(savedCategories));
+      } catch {
+        // Invalid JSON, ignore
+      }
+    }
+    setIsHydrated(true);
+  }, []);
 
   // URLパラメータからreset-passwordのトークンを取得
   useEffect(() => {
@@ -118,10 +144,6 @@ function AppContent() {
       import("@/components/Watchlist/WatchlistScreen");
       import("@/components/Settings/SettingsScreen");
       import("@/components/Top10/Top10Screen");
-      import('@/components/Search/SearchScreen');
-      import('@/components/Watchlist/WatchlistScreen');
-      import('@/components/Settings/SettingsScreen');
-      import('@/components/Top10/Top10Screen');
     }
   }, [hasCompletedOnboarding, isAuthenticated]);
 
@@ -142,8 +164,12 @@ function AppContent() {
     window.history.replaceState({}, '', '/');
   };
 
-  const handleCompleteOnboarding = () => {
+  const handleCompleteOnboarding = (categories: string[]) => {
+    setInterestedCategories(categories);
     setHasCompletedOnboarding(true);
+    // LocalStorageに保存
+    localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETED, 'true');
+    localStorage.setItem(STORAGE_KEYS.INTERESTED_CATEGORIES, JSON.stringify(categories));
   };
 
   const handleAddToWatchlist = (product: Product) => {
@@ -208,9 +234,9 @@ function AppContent() {
     setCurrentScreen(previousScreen);
   };
 
-  // 初回ロード時（トークンがあり認証チェック中）はローディング表示
+  // 初回ロード時（トークンがあり認証チェック中、またはハイドレーション中）はローディング表示
   // ログイン/サインアップ処理中はLoginScreen内でローディングを表示
-  if (isLoading && isAuthenticated) {
+  if ((isLoading && isAuthenticated) || !isHydrated) {
     return (
       <div className="min-h-screen bg-white dark:bg-slate-950 flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
@@ -254,6 +280,7 @@ function AppContent() {
           onViewProduct={handleViewProduct}
           onAddToWatchlist={handleAddToWatchlist}
           watchlist={watchlist}
+          interestedCategories={interestedCategories}
         />
       )}
       {currentScreen === "search" && (
