@@ -21,7 +21,10 @@ const popularKeywords = [
 ];
 
 interface SearchScreenProps {
-  onViewProduct: (product: Product) => void;
+  onViewProduct: (
+    product: Product,
+    externalProduct?: ExternalSearchProduct,
+  ) => void;
   onAddToWatchlist: (product: Product) => void;
   onAddExternalToWatchlist: (product: ExternalSearchProduct) => void;
   watchlist: Product[];
@@ -130,7 +133,7 @@ export function SearchScreen({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
-            placeholder="商品名やブランドで検索..."
+            placeholder="検索..."
             className="w-full pl-12 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
           />
         </div>
@@ -138,7 +141,7 @@ export function SearchScreen({
 
       {/* Popular Keywords */}
       {!searchQuery && (
-        <div className="mb-4">
+        <div className="px-6 pt-4 mb-4">
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
             人気のキーワード
           </p>
@@ -149,7 +152,7 @@ export function SearchScreen({
                 onClick={() => {
                   // 一度クリアしてから設定することで、同じキーワードでも再検索される
                   onSearchQueryChange("");
-                  setTimeout(() => onSearchQueryChange(keyword), 0);
+                  setTimeout(() => onSearchQueryChange(`メンズ ${keyword}`), 0);
                 }}
                 className="px-3 py-1.5 text-sm bg-slate-100 dark:bg-slate-800 hover:bg-orange-50 dark:hover:bg-orange-900/20 text-slate-700 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 rounded-lg transition-colors"
               >
@@ -204,27 +207,28 @@ export function SearchScreen({
             </p>
 
             <div className="grid grid-cols-2 gap-4">
-              {searchProducts.map((searchProducts) => {
+              {searchProducts.map((product) => {
                 const isInWatchlist = watchlist.some(
-                  (p) => p.id === searchProducts.rakuten_product_id,
+                  (p) => p.id === product.rakuten_product_id,
                 );
 
                 return (
                   <div
-                    key={searchProducts.rakuten_product_id}
+                    key={product.rakuten_product_id}
                     className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 hover:border-orange-500 dark:hover:border-orange-500 transition-colors cursor-pointer"
                     onClick={() =>
                       onViewProduct(
-                        convertExternalProductToProduct(searchProducts),
+                        convertExternalProductToProduct(product),
+                        product,
                       )
                     }
                   >
                     {/* Image */}
                     <div className="relative mb-3">
-                      {searchProducts.image_url ? (
+                      {product.image_url ? (
                         <Image
-                          src={searchProducts.image_url}
-                          alt={searchProducts.name}
+                          src={product.image_url}
+                          alt={product.name}
                           width={400}
                           height={400}
                           className="w-full aspect-square object-cover rounded-xl"
@@ -243,7 +247,7 @@ export function SearchScreen({
                           onClick={(e) => {
                             e.stopPropagation();
                             if (!isInWatchlist)
-                              onAddExternalToWatchlist(searchProducts);
+                              onAddExternalToWatchlist(product);
                           }}
                           disabled={isInWatchlist}
                           className={`w-8 h-8 rounded-lg flex items-center justify-center backdrop-blur-sm transition-colors ${
@@ -258,34 +262,32 @@ export function SearchScreen({
                     </div>
 
                     {/* Product Info */}
-                    {searchProducts.shop_name && (
+                    {product.shop_name && (
                       <p className="text-xs text-slate-500 dark:text-slate-400 mb-1">
-                        {searchProducts.shop_name}
+                        {product.shop_name}
                       </p>
                     )}
 
                     <h3 className="text-sm text-slate-900 dark:text-white line-clamp-2 mb-2 min-h-[2.5rem]">
-                      {searchProducts.name}
+                      {product.name}
                     </h3>
 
                     <div className="space-y-1">
                       <div className="flex items-baseline gap-1">
                         <span className="text-lg text-slate-900 dark:text-white font-medium">
-                          {searchProducts.current_price
-                            ? `¥${searchProducts.current_price.toLocaleString()}`
+                          {product.current_price
+                            ? `¥${product.current_price.toLocaleString()}`
                             : "¥---"}
                         </span>
                       </div>
 
                       {/* レビュー情報 */}
-                      {searchProducts.review_count > 0 && (
+                      {product.review_count > 0 && (
                         <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                          {searchProducts.review_score && (
-                            <span>
-                              ⭐ {searchProducts.review_score.toFixed(1)}
-                            </span>
+                          {product.review_score && (
+                            <span>⭐ {product.review_score.toFixed(1)}</span>
                           )}
-                          <span>({searchProducts.review_count}件)</span>
+                          <span>({product.review_count}件)</span>
                         </div>
                       )}
                     </div>
