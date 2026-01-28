@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Heart, Search, Trash2, Target, Trophy } from "lucide-react";
-import { Heart, Search, Trash2, ExternalLink } from "lucide-react";
+import { Heart, Search, Trash2, Target, Trophy , ExternalLink } from "lucide-react";
 import Image from "next/image";
 import { watchlistApi } from "@/lib/api-client";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -117,7 +116,7 @@ export function WatchlistScreen({
             </div>
             <h3 className="text-slate-900 dark:text-white mb-2">
               ウォッチリストが空です
-            </h3>
+              </h3>
             <p className="text-slate-600 dark:text-slate-400 text-center mb-6">
               気になる商品を追加して
               <br />
@@ -156,53 +155,6 @@ export function WatchlistScreen({
                       <Trophy className="w-4 h-4 text-green-600 dark:text-green-400" />
                       <span className="text-sm text-green-700 dark:text-green-400">
                         🎉 目標価格に到達しました！
-            {watchlist.map((item) => (
-              <div
-                key={item.id}
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 hover:border-orange-500 dark:hover:border-orange-500 transition-colors"
-              >
-                <div className="flex gap-4">
-                  {/* Image */}
-                  <div
-                    className="flex-shrink-0 cursor-pointer"
-                    onClick={() => onViewProduct(convertToProduct(item))}
-                  >
-                    <Image
-                      src={
-                        item.product.image_url ||
-                        "https://placehold.co/400x400?text=No+Image"
-                      }
-                      alt={item.product.name}
-                      width={400}
-                      height={400}
-                      className="w-24 h-24 object-cover rounded-xl"
-                    />
-                  </div>
-
-                  {/* Info */}
-                  <div
-                    className="flex-1 min-w-0 cursor-pointer"
-                    onClick={() => onViewProduct(convertToProduct(item))}
-                  >
-                    <h3 className="text-slate-900 dark:text-white text-sm line-clamp-2 mb-2">
-                      {item.product.name}
-                    </h3>
-                    <div className="flex items-center gap-2 mb-2">
-                      {item.product.brand_name && (
-                        <span className="text-xs text-slate-500 dark:text-slate-400">
-                          {item.product.brand_name}
-                        </span>
-                      )}
-                      {item.product.discount_rate &&
-                        item.product.discount_rate > 0 && (
-                          <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded">
-                            {item.product.discount_rate}%OFF
-                          </span>
-                        )}
-                    </div>
-                    <div className="flex items-baseline gap-2 mb-2">
-                      <span className="text-lg text-slate-900 dark:text-white">
-                        ¥{item.product.current_price.toLocaleString()}
                       </span>
                     </div>
                   )}
@@ -211,10 +163,13 @@ export function WatchlistScreen({
                     {/* Image */}
                     <div
                       className="flex-shrink-0 cursor-pointer"
-                      onClick={() => onViewProduct(item.product.id)}
+                      onClick={() => onViewProduct(convertToProduct(item))}
                     >
                       <Image
-                        src={item.product.image_url || 'https://placehold.co/400x400?text=No+Image'}
+                        src={
+                          item.product.image_url ||
+                        "https://placehold.co/400x400?text=No+Image"
+                      }
                         alt={item.product.name}
                         width={400}
                         height={400}
@@ -225,16 +180,19 @@ export function WatchlistScreen({
                     {/* Info */}
                     <div
                       className="flex-1 min-w-0 cursor-pointer"
-                      onClick={() => onViewProduct(item.product.id)}
+                      onClick={() => onViewProduct(convertToProduct(item))}
                     >
                       <h3 className="text-slate-900 dark:text-white text-sm line-clamp-2 mb-2">
                         {item.product.name}
                       </h3>
                       <div className="flex items-center gap-2 mb-2">
                         {item.product.brand_name && (
-                          <span className="text-xs text-slate-500 dark:text-slate-400">{item.product.brand_name}</span>
+                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                            {item.product.brand_name}
+                            </span>
                         )}
-                        {item.product.discount_rate && item.product.discount_rate > 0 && (
+                        {item.product.discount_rate &&
+                        item.product.discount_rate > 0 && (
                           <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs rounded">
                             {item.product.discount_rate}%OFF
                           </span>
@@ -304,12 +262,12 @@ export function WatchlistScreen({
                         handleRemove(item.id);
                       }}
                       className="flex-shrink-0 w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center"
-                      className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-500 transition-colors flex items-center justify-center"
                     >
                       <Trash2 className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
+              </div>
               );
             })}
           </div>
