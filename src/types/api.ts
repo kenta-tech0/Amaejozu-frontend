@@ -89,7 +89,7 @@ export interface WatchlistItem {
     product_url?: string;
   };
   target_price?: number;
-  added_at: string; // ISO8601
+  added_at: string;
 }
 
 export interface WatchlistResponse {
