@@ -183,3 +183,35 @@ export interface NotificationSettingsUpdateRequest {
   notification_frequency?: string | null;
 }
 
+// 週間ランキング
+export interface ProductInRanking {
+  id: string;
+  name: string;
+  brand_name?: string;
+  category_name?: string;
+  current_price: number;
+  original_price?: number;
+  discount_rate?: number;
+  image_url?: string;
+  product_url?: string;
+  review_score?: number;
+  review_count?: number;
+}
+
+export interface WeeklyRankingItem {
+  rank_position: number;
+  watchlist_count: number;
+  ai_recommendation?: string;
+  previous_rank?: number;
+  rank_change?: "UP" | "DOWN" | "NEW" | "STAY";
+  product: ProductInRanking;
+}
+
+export interface WeeklyRankingResponse {
+  year: number;
+  week_number: number;
+  week_label: string;
+  generated_at?: string;
+  rankings: WeeklyRankingItem[];
+}
+
